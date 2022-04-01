@@ -1,0 +1,5 @@
+config.env
+.prettierrc
+.eslint.json
+node_modules/
+
