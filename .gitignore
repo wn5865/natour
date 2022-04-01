@@ -1,5 +1,5 @@
 config.env
 .prettierrc
-.eslint.json
+.eslintrc.json
 node_modules/
 
