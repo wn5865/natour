@@ -2,22 +2,56 @@
   "name": "natours",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "engines": {
-    "node": ">=16.0.0"
+  "main": "./public/js/bundle.js",
+  "targets": {
+    "main": {
+      "source": "./public/js/index.js",
+      "includeNodeModules": [
+        "axios",
+        "mapbox-gl",
+        "core-js",
+        "regenerator-runtime",
+        "process"
+      ]
+    }
+  },
+  "alias": {
+    "buffer": false
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js"
+    "start:prod": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb serverjs",
+    "watch:js": "parcel watch --log-level verbose --no-cache",
+    "build:js": "parcel build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.27.2",
+    "bcryptjs": "^2.4.3",
+    "buffer": "^6.0.3",
+    "cookie-parser": "^1.4.6",
+    "core-js": "^3.22.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.4.0",
+    "helmet": "^5.0.2",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
+    "mapbox-gl": "^2.8.2",
     "mongoose": "^6.2.9",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "ndb": "^1.1.5",
+    "nodemailer": "^6.7.3",
+    "process": "^0.11.10",
+    "pug": "^3.0.2",
+    "regenerator-runtime": "^0.13.9",
+    "slugify": "^1.6.5",
+    "validator": "^13.7.0",
+    "xss-clean": "^0.1.1"
   },
   "devDependencies": {
     "eslint": "^8.9.0",
@@ -28,6 +62,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
+    "parcel": "^2.5.0",
     "prettier": "^2.5.1"
   }
 }

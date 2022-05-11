@@ -279,7 +279,7 @@ body {
 .btn-text:hover {
   background-color: #55c57a;
   color: #fff;
-  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 1rem 2rem rgba(3, 1, 1, 0.15);
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
