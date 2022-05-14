@@ -31,6 +31,13 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
+process.on('SIGTERM', () => {
+  console.log('SIGTERM RECEIVED. Shutting down gracefully.');
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
 // Todos
 //  1) Implement restriction that users can only review a tour that they have
 //  actually booked
