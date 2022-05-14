@@ -29,6 +29,9 @@ app.set('views', path.join(__dirname, 'views'));
 // Implement CORS
 app.use(cors());
 
+// CORS pre-flight
+app.options('*', cors());
+
 // Compress responses
 app.use(compression());
 
