@@ -22,6 +22,9 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+// Compress responses
+app.use(compression());
+
 // 1) GLOGAL MIDDLEWARES
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -46,9 +49,6 @@ app.use(
     },
   })
 );
-
-// Compress txt responses
-app.use(compression());
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
