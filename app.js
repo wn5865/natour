@@ -14,6 +14,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
@@ -28,11 +29,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'", 'ws:', 'https://*.mapbox.com/'],
+      defaultSrc: [
+        "'self'",
+        'ws:',
+        'https://*.mapbox.com/',
+        'https://js.stripe.com/',
+      ],
       scriptSrc: [
         "'self'",
         'blob:',
         'https://*.mapbox.com/',
+        'https://js.stripe.com/',
         'https://cdn.jsdelivr.net',
       ],
     },
@@ -87,6 +94,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 app.all('*', (req, res, next) => {
   // res.status(404).json({
