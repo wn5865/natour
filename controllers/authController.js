@@ -44,7 +44,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangedAt: req.body.passwordChangedAt,
   });
   const url = `${req.protocol}://${req.header('host')}/me`;
-  console.log(url);
   await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
