@@ -15,7 +15,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     payment_method_types: ['card'],
     success_url: `${req.protocol}://${req.header('host')}/my-tours?tour=${
       req.params.tourId
-    }&user=${req.user.id}&price=${tour.price}`,
+    }&user=${req.user.id}`,
     cancel_url: `${req.protocol}://${req.header('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -54,7 +54,7 @@ exports.webhookCheckout = async (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
 
-    if (event.type == 'checkout.session.complete') {
+    if (event.type == 'checkout.session.completed') {
       await this.createBookingCheckout(event.data.object);
     }
 
