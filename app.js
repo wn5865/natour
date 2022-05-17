@@ -21,23 +21,20 @@ const bookingController = require('./controllers/bookingController');
 
 const app = express();
 
+// Heroku proxy configuration
 app.enable('trust proxy');
 
+// Set view engine and path to views
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOGAL MIDDLEWARES
-// Implement CORS
+// Enable CORS and CORS pre-flight
 app.use(cors());
-
-// CORS pre-flight
 app.options('*', cors());
 
 // Compress responses
 app.use(compression());
-
-// Serving static files
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Set HTTP headers for security
 app.use(
@@ -61,9 +58,11 @@ app.use(
 );
 
 // Development logging
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Limit requests from same IP
 const limiter = rateLimit({
   max: 100,
@@ -72,7 +71,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter); // against bruteforce and DOS attack
 
-// Stripe Webhook
+// Stripe Webhook (put here before body is parsed to JSON)
 app.post(
   '/webhook-checkout',
   express.raw({ type: 'application/json' }),
@@ -104,29 +103,15 @@ app.use(
   })
 );
 
-// Test middleware
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  next();
-});
-
 // 2) ROUTES
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/bookings', bookingRouter);
-
 app.all('*', (req, res, next) => {
-  // res.status(404).json({
-  //   status: 'fail',
-  //   message: `Can't find ${req.originalUrl} on this server`,
-  // });
-  const err = new AppError(`Can't find ${req.originalUrl} on this server`, 404);
-
-  next(err);
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
-
 app.use(globalErrorHandler);
 
 module.exports = app;

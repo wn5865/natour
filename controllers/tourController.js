@@ -1,58 +1,21 @@
 const multer = require('multer');
 const sharp = require('sharp');
+
 const Tour = require('../models/tourModel');
-const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 const factory = require('../controllers/handlerFactory');
 
-const multerStorage = multer.memoryStorage();
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
+exports.getAllTours = factory.getAll(Tour);
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image. Please upload only images.', 400), false);
-  }
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-});
-
-exports.uploadTourImages = upload.fields([
-  { name: 'imageCover', maxCount: 1 },
-  { name: 'images', maxCount: 3 },
-]);
-
-exports.resizeTourImages = catchAsync(async (req, res, next) => {
-  if (!req.files.imageCover || !req.files.images) return next();
-
-  // 1) Cover image
-  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
-  await sharp(req.files.imageCover[0].buffer)
-    .resize(2000, 1333)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/tours/${req.body.imageCover}`);
-
-  // 2) Images
-  req.body.images = [];
-  await Promise.all(
-    req.files.images.map(async (file, i) => {
-      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
-      await sharp(req.files.images[i].buffer)
-        .resize(2000, 1333)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`public/img/tours/${filename}`);
-      req.body.images.push(filename);
-    })
-  );
-
-  next();
-});
-
+/**
+ * Middleware for retrieving top 5 tours when sorted by average
+ * ratings(descending) and price(ascending)
+ */
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
@@ -60,20 +23,13 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = factory.getAll(Tour);
-exports.getTour = factory.getOne(Tour, { path: 'reviews' });
-exports.createTour = factory.createOne(Tour);
-exports.updateTour = factory.updateOne(Tour);
-exports.deleteTour = factory.deleteOne(Tour);
-
+/**
+ * Calculates summary statistics of all tours grouped by 'difficulty'
+ */
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
-      $match: { ratingsAverage: { $gte: 4.5 } },
-    },
-    {
       $group: {
-        // _id: '$ratingsAverage',
         _id: { $toUpper: '$difficulty' },
         numTours: { $sum: 1 },
         numRatings: { $sum: '$ratingsQuantity' },
@@ -83,22 +39,19 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
         maxPrice: { $max: '$price' },
       },
     },
-    {
-      $sort: { avgPrice: 1 },
-    },
-    // {
-    //   $match: { _id: { $ne: 'EASY' } },
-    // },
+    { $sort: { avgPrice: 1 } },
   ]);
 
   res.status(200).json({
     status: 'success',
-    data: {
-      stats,
-    },
+    data: { stats },
   });
 });
 
+/**
+ * Retrieves the number of tours grouped by the month of start dates in the
+ * specified year
+ */
 exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   const year = Number(req.params.year);
   const plan = await Tour.aggregate([
@@ -120,7 +73,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
     { $addFields: { month: '$_id' } },
     { $project: { _id: 0 } },
-    { $sort: { numTourStarts: -1 } },
+    { $sort: { month: 1 } },
     { $limit: 12 },
   ]);
 
@@ -130,10 +83,12 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Retrieves tours within the specified distance from a point
+ */
 exports.getToursWithin = catchAsync(async function (req, res, next) {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
-
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
 
   if (!lat || !lng) {
@@ -158,10 +113,12 @@ exports.getToursWithin = catchAsync(async function (req, res, next) {
   });
 });
 
+/**
+ * Calculates distances (in miles or kilometers) from a point to all tours
+ */
 exports.getDistances = catchAsync(async (req, res, next) => {
   const { latlng, unit } = req.params;
-  const [lat, lng] = latlng.split(',');
-
+  const [lat, lng] = latlng.split(',').map(Number);
   const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
 
   if (!lat || !lng) {
@@ -175,11 +132,11 @@ exports.getDistances = catchAsync(async (req, res, next) => {
 
   const distances = await Tour.aggregate([
     {
-      // geoNear must be the first pipeline
       $geoNear: {
+        // geoNear must be the first pipeline
         near: {
           type: 'Point',
-          coordinates: [+lng, +lat],
+          coordinates: [lng, lat],
         },
         distanceField: 'distance',
         distanceMultiplier: multiplier,
@@ -195,8 +152,50 @@ exports.getDistances = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: {
-      data: distances,
-    },
+    data: { distances },
   });
+});
+
+// Middlewares for handling multipart/form-data
+const storage = multer.memoryStorage();
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) return cb(null, true);
+  cb(new AppError('Not an image. Please upload only images.', 400), false);
+};
+const upload = multer({ storage, fileFilter });
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  // Request must have both cover image and ordinary images
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // 1) Cover image
+  // Add cover image filename to request
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  // Process the image
+  await sharp(req.files.imageCover[0].buffer) // Retrieve image data
+    .resize(2000, 1333)
+    .toFormat('jpeg') // Force output to JPEG format
+    .jpeg({ quality: 90 }) // Adjust the qualtiy (default === 80)
+    .toFile(`public/img/tours/${req.body.imageCover}`); // Save as a file
+
+  // 2) Images
+  req.body.images = []; // array to which filenames are pushed
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+      await sharp(req.files.images[i].buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+      req.body.images.push(filename);
+    })
+  );
+
+  next();
 });
