@@ -6,6 +6,45 @@ const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
 
+/**
+ * Middleware to set tour ID, user ID, and price before creating a booking
+ */
+exports.setTourUserPrice = catchAsync(async (req, res, next) => {
+  // Set tour ID
+  if (!req.body.tour) {
+    if (!req.params.tourId)
+      return next(
+        new AppError(
+          'Tour ID must be specified as a parameter or in the body',
+          400
+        )
+      );
+    req.body.tour = req.params.tourId;
+  }
+
+  // Set user ID
+  if (!req.body.user) {
+    if (!req.params.userId)
+      return next(
+        new AppError(
+          'User ID must be specified as a parameter or in the body',
+          400
+        )
+      );
+    req.body.user = req.params.userId;
+  }
+
+  // Set price
+  if (!req.body.price) {
+    const tour = await Tour.findById(req.body.tour);
+    if (!tour) {
+      return next(new AppError('Tour ID is invalid', 400));
+    }
+    req.body.price = tour.price;
+  }
+  next();
+});
+
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
