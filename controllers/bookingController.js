@@ -7,6 +7,21 @@ const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
 
 /**
+ * Checks if the current user has actually booked a tour.
+ * Prevents a user from writing reviews without booking.
+ */
+exports.checkIfBooked = catchAsync(async (req, res, next) => {
+  const booking = await Booking.findOne({
+    user: req.body.user,
+    tour: req.body.tour,
+  });
+  if (!booking) {
+    return next(new AppError('You must book a tour to write a review', 400));
+  }
+  next();
+});
+
+/**
  * Middleware to set tour ID, user ID, and price before creating a booking
  */
 exports.setTourUserPrice = catchAsync(async (req, res, next) => {
@@ -86,7 +101,7 @@ const createBookingCheckout = async (session) => {
 exports.webhookCheckout = async (req, res, next) => {
   try {
     const payload = req.body;
-    const signature = req.headers['stripe-signature'];
+    const signature = req.header('stripe-signature');
     const event = stripe.webhooks.constructEvent(
       payload,
       signature,

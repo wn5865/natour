@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const reviewController = require('../controllers/reviewController');
 const authController = require('../controllers/authController');
+const bookingController = require('../controllers/bookingController');
 
 router.use(authController.protect);
 
@@ -11,6 +12,7 @@ router
   .post(
     authController.restrictTo('user'),
     reviewController.setTourUserIds,
+    bookingController.checkIfBooked,
     reviewController.createReview
   );
 
