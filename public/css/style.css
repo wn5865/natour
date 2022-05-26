@@ -755,6 +755,14 @@ body {
   font-weight: 400;
 }
 
+.cta__select {
+  text-transform: uppercase;
+}
+
+.cta__select:focus {
+  background-color: transparent;
+}
+
 .user-view {
   background-color: #fff;
   max-width: 120rem;
@@ -768,6 +776,7 @@ body {
   display: -ms-flexbox;
   display: flex;
 }
+
 .user-view__menu {
   -webkit-box-flex: 32rem;
   -ms-flex: 32rem 0 0px;
