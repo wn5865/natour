@@ -74,7 +74,33 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false,
     },
-    startDates: [Date],
+    startDates: {
+      type: [
+        {
+          date: {
+            type: Date,
+            required: [true, 'A tour must have a start date'],
+          },
+          participants: {
+            type: Number,
+            default: 0,
+          },
+          soldOut: {
+            type: Boolean,
+            default: false,
+          },
+        },
+      ],
+      validate: {
+        validator: function (dates) {
+          return dates
+            .map((date) => date.participants <= this.maxGroupSize)
+            .every(Boolean);
+        },
+        message:
+          'The number of participants({VALUE}) cannot exceed the maximum group size',
+      },
+    },
     secretTour: {
       type: Boolean,
       default: false,
