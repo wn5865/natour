@@ -62,10 +62,11 @@ if (bookBtn && dateOption) {
     this.textContent = 'Processing...';
 
     const dateId = dateOption.value;
-    if (!dateId) return showAlert('error', 'Please select a start date');
+    if (!dateId) {
+      this.textContent = btnText;
+      return showAlert('error', 'Please select a start date');
+    }
     bookTour(dateId);
-
-    this.textContent = btnText;
   });
 }
 
