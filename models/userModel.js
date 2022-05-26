@@ -57,16 +57,19 @@ const userSchema = new mongoose.Schema({
 
 // Document middleware
 userSchema.pre('save', async function (next) {
+  // Don't run when importing dev data that has already been hashed
+  if (process.env.NODE_ENV === 'import') return next();
+
   // Only run this function if password is actually modified
   if (!this.isModified('password')) return next();
 
   // Hash the password with the cost of 12
   this.password = await bcrypt.hash(this.password, 12); // hashes asynchronously
 
-  // delete passwordConfirm
+  // Delete passwordConfirm
   this.passwordConfirm = undefined;
 
-  // update changedPasswordAt
+  // Update changedPasswordAt
   if (this.isNew) return next();
   this.changedPasswordAt = Date.now();
   next();
