@@ -45,6 +45,7 @@ app.use(
         'ws:',
         'https://*.mapbox.com/',
         'https://js.stripe.com/',
+        'https://checkout.stripe.com/',
       ],
       scriptSrc: [
         "'self'",
