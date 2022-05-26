@@ -9,7 +9,7 @@ module.exports = class APIFeatures {
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    // 1B) advanced filtering
+    // advanced filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(
       /\b(gte|gt|lte|lt|regex)\b/g,
