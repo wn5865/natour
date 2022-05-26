@@ -12,6 +12,7 @@ const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
+const dateOption = document.getElementById('date');
 
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
@@ -55,11 +56,16 @@ if (userPasswordForm) {
   });
 }
 
-if (bookBtn) {
+if (bookBtn && dateOption) {
   bookBtn.addEventListener('click', function (e) {
+    const btnText = this.textContent;
     this.textContent = 'Processing...';
-    const { tourId } = this.dataset;
-    bookTour(tourId);
+
+    const dateId = dateOption.value;
+    if (!dateId) return showAlert('error', 'Please select a start date');
+    bookTour(dateId);
+
+    this.textContent = btnText;
   });
 }
 

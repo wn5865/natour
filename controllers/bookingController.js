@@ -6,6 +6,12 @@ const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
 
+exports.createBooking = factory.createOne(Booking);
+exports.getBooking = factory.getOne(Booking);
+exports.getAllBookings = factory.getAll(Booking);
+exports.updateBooking = factory.updateOne(Booking);
+exports.deleteBooking = factory.deleteOne(Booking);
+
 /**
  * Checks if the current user has actually booked a tour.
  * Prevents a user from writing reviews without booking.
@@ -60,23 +66,28 @@ exports.setTourUserPrice = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  // 1) Get the currently booked tour
-  const tour = await Tour.findById(req.params.tourId);
+exports.checkout = catchAsync(async (req, res, next) => {
+  // 1) Get the current tour
+  const tour = await Tour.findOne({ 'startDates._id': req.params.dateId });
+  if (!tour) return next(new AppError('Invalid start date', 400));
+
+  const date = tour.startDates.find((date) => date.id === req.params.dateId);
+  const dateStr = new Date(date.date).toLocaleDateString('en-US');
 
   // 2) Create checkout session
-  const host = `${req.protocol}://${req.header('host')}`;
+  const domain = `${req.protocol}://${req.header('host')}`;
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${host}/my-tours?alert=booking`,
-    cancel_url: `${host}/tour/${tour.slug}`,
+    success_url: `${domain}/my-tours?alert=booking`,
+    cancel_url: `${domain}/tour/${tour.slug}`,
     customer_email: req.user.email,
-    client_reference_id: req.params.tourId,
+    client_reference_id: req.params.dateId,
     line_items: [
       {
-        name: `${tour.name} Tour`,
+        name: `${tour.name} Tour (Date: ${dateStr})`,
         description: tour.summary,
-        images: [`${host}/img/tours/${tour.imageCover}`],
+        images: [`${domain}/img/tours/${tour.imageCover}`],
         amount: tour.price * 100,
         currency: 'usd',
         quantity: 1,
@@ -84,19 +95,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     ],
   });
 
-  // 3) Create session as response
-  res.status(200).json({
-    status: 'success',
-    session,
-  });
+  // 3) Redirect to session URL
+  res.redirect(303, session.url);
 });
-
-const createBookingCheckout = async (session) => {
-  const tour = session.client_reference_id;
-  const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.amount_total / 100;
-  await Booking.create({ tour, user, price });
-};
 
 exports.webhookCheckout = async (req, res, next) => {
   try {
@@ -118,8 +119,9 @@ exports.webhookCheckout = async (req, res, next) => {
   }
 };
 
-exports.createBooking = factory.createOne(Booking);
-exports.getBooking = factory.getOne(Booking);
-exports.getAllBookings = factory.getAll(Booking);
-exports.updateBooking = factory.updateOne(Booking);
-exports.deleteBooking = factory.deleteOne(Booking);
+const createBookingCheckout = async (session) => {
+  const tour = session.client_reference_id;
+  const user = (await User.findOne({ email: session.customer_email })).id;
+  const price = session.amount_total / 100;
+  await Booking.create({ tour, user, price });
+};
