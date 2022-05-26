@@ -118,8 +118,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
     );
   } catch (err) {
     // case that session verification fails
-    res.status(400).send(`Webhook error: ${err.message}`);
-    return next(err);
+    return res.status(400).send(`Webhook error: ${err.message}`);
   }
 
   if (event.type === 'checkout.session.completed') {
@@ -134,8 +133,17 @@ const fulfillOrder = async (session) => {
   const date = tour.startDates.find((date) => date.id === dateId);
 
   // Increment the number of participants
-  date.participants++;
-  await tour.save(); // Pre-save middleware validates
+  if (date.soldOut) {
+    throw AppError(
+      'The tour date has already been sold out. Please try another date'
+    );
+  } else {
+    ++date.participants;
+    if (date.participants === tour.maxGroupSize) {
+      date.soldOut = true;
+    }
+  }
+  await tour.save();
 
   const user = await User.findOne({ email: session.customer_email });
   const price = session.amount_total / 100;
