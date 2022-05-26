@@ -66,23 +66,26 @@ exports.setTourUserPrice = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.checkout = catchAsync(async (req, res, next) => {
-  // 1) Get the current tour
-  const tour = await Tour.findOne({ 'startDates._id': req.params.dateId });
-  if (!tour) return next(new AppError('Invalid start date', 400));
-
-  const date = tour.startDates.find((date) => date.id === req.params.dateId);
-  const dateStr = new Date(date.date).toLocaleDateString('en-US');
+exports.getCheckoutSession = catchAsync(async (req, res, next) => {
+  // 1) Get tour and tour date
+  const { tourId, dateId } = req.params;
+  const tour = await Tour.findById(tourId);
+  const date = tour.startDates.find((date) => date.id === dateId);
 
   // 2) Create checkout session
   const domain = `${req.protocol}://${req.header('host')}`;
+  const dateStr = new Date(date.date).toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     success_url: `${domain}/my-tours?alert=booking`,
     cancel_url: `${domain}/tour/${tour.slug}`,
     customer_email: req.user.email,
-    client_reference_id: req.params.dateId,
+    client_reference_id: req.params.join('/'),
     line_items: [
       {
         name: `${tour.name} Tour (Date: ${dateStr})`,
@@ -95,35 +98,46 @@ exports.checkout = catchAsync(async (req, res, next) => {
     ],
   });
 
-  // 3) Redirect to checkout page
-  stripe.redirectToCheckout({
-    sessionId: session.id,
+  // 3) Create session as response
+  res.status(200).json({
+    status: 'success',
+    session,
   });
 });
 
-exports.webhookCheckout = async (req, res, next) => {
+exports.webhookCheckout = catchAsync(async (req, res, next) => {
+  const payload = req.body;
+  const signature = req.header('stripe-signature');
+  let event;
+
   try {
-    const payload = req.body;
-    const signature = req.header('stripe-signature');
-    const event = stripe.webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       payload,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-
-    if (event.type === 'checkout.session.completed') {
-      await createBookingCheckout(event.data.object);
-    }
-
-    res.status(200).json({ received: true });
   } catch (err) {
-    return res.status(400).send(`Webhook error: ${err.message}`);
+    // case that session verification fails
+    res.status(400).send(`Webhook error: ${err.message}`);
+    return next(err);
   }
-};
 
-const createBookingCheckout = async (session) => {
-  const tour = session.client_reference_id;
-  const user = (await User.findOne({ email: session.customer_email })).id;
+  if (event.type === 'checkout.session.completed') {
+    await fulfillOrder(event.data.object);
+  }
+  res.status(200).json({ received: true });
+});
+
+const fulfillOrder = async (session) => {
+  const [tourId, dateId] = session.client_reference_id.split('/');
+  const tour = await Tour.findById(tourId);
+  const date = tour.startDates.find((date) => date.id === dateId);
+
+  // Increment the number of participants
+  date.participants++;
+  await tour.save(); // Pre-save middleware validates
+
+  const user = await User.findOne({ email: session.customer_email });
   const price = session.amount_total / 100;
-  await Booking.create({ tour, user, price });
+  await Booking.create({ tour: tour.id, user: user.id, price });
 };

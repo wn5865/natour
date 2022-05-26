@@ -82,7 +82,7 @@ block content
         h2.heading-secondary What are you waiting for?
         p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
         if user
-          select.btn.cta__select(id='date')
+          select.btn.cta__select(id='date', data-tour-id=`${tour.id}`)
             option(value='') Select start date!
             each date in tour.startDates
               - if (date.participants < tour.maxGroupSize)

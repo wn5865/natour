@@ -6,7 +6,10 @@ const router = express.Router({ mergeParams: true });
 
 router.use(authController.protect);
 
-router.get('/checkout/:dateId', bookingController.checkout);
+router.get(
+  '/create-checkout-session/:tourId/:dateId',
+  bookingController.getCheckoutSession
+);
 
 router.use(authController.restrictTo('admin', 'lead-guide'));
 

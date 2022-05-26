@@ -573,12 +573,13 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', async function
 if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
     const btnText = this.textContent;
     this.textContent = 'Processing...';
+    const tourId = dateOption.dataset.tourId;
     const dateId = dateOption.value;
     if (!dateId) {
         this.textContent = btnText;
         return _alertsJs.showAlert('error', 'Please select a start date');
     }
-    _stripe.bookTour(dateId);
+    _stripe.bookTour(tourId, dateId);
 });
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
@@ -47936,10 +47937,14 @@ var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alertsJs = require("./alerts.js");
 const stripe = Stripe('pk_test_51KyWrGI5Q33gynFj06zlwb1Euw7k6CH6FJHaNhV676QaWBi5Bdyxt5mRIckirkL9pSuH07vhwuk2QFDlopRFGYEq00xrMtzdop');
-const bookTour = async (dateId, tourId)=>{
+const bookTour = async (tourId, dateId)=>{
     try {
-        // create checkout session and redirect using API
-        await _axiosDefault.default.get(`/api/v1/bookings/checkout/${dateId}`);
+        // Create checkout session
+        const response = await _axiosDefault.default(`/api/v1/bookings/create-checkout-session/${tourId}/${dateId}`);
+        // Redirect to checkout page provided by Stripe
+        await stripe.redirectToCheckout({
+            sessionId: response.data.session.id
+        });
     } catch (err) {
         _alertsJs.showAlert('error', err.message);
     }

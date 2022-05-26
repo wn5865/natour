@@ -61,12 +61,13 @@ if (bookBtn && dateOption) {
     const btnText = this.textContent;
     this.textContent = 'Processing...';
 
+    const tourId = dateOption.dataset.tourId;
     const dateId = dateOption.value;
     if (!dateId) {
       this.textContent = btnText;
       return showAlert('error', 'Please select a start date');
     }
-    bookTour(dateId);
+    bookTour(tourId, dateId);
   });
 }
 
