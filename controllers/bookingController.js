@@ -95,8 +95,10 @@ exports.checkout = catchAsync(async (req, res, next) => {
     ],
   });
 
-  // 3) Redirect to session URL
-  res.redirect(303, session.url);
+  // 3) Redirect to checkout page
+  stripe.redirectToCheckout({
+    sessionId: session.id,
+  });
 });
 
 exports.webhookCheckout = async (req, res, next) => {
