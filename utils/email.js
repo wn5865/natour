@@ -42,7 +42,11 @@ module.exports = class Email {
 
     // 3) Create a transport and send email
     this.newTransport().sendMail(mailOptions, (err, info) => {
-      if (!info) return;
+      if (!info || err) {
+        console.log('failed to send an email');
+        console.log(err);
+        return;
+      }
       console.log(info.envelope);
       console.log(info.messageId);
     });
