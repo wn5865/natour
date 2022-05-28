@@ -1,7 +1,5 @@
 const nodemailer = require('nodemailer');
 const pug = require('pug');
-let aws = require('@aws-sdk/client-ses');
-let { defaultProvider } = require('@aws-sdk/credential-provider-node');
 const { convert } = require('html-to-text');
 
 module.exports = class Email {
@@ -13,14 +11,14 @@ module.exports = class Email {
   }
 
   newTransport() {
-    const ses = new aws.SES({
-      apiVersion: '2010-12-01',
-      region: 'ap-northeast-2',
-      defaultProvider,
+    return nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
-
-    // create Nodemailer SES transporter
-    return nodemailer.createTransport({ SES: { ses, aws } });
   }
 
   send(template, subject) {
@@ -42,11 +40,7 @@ module.exports = class Email {
 
     // 3) Create a transport and send email
     this.newTransport().sendMail(mailOptions, (err, info) => {
-      if (!info || err) {
-        console.log('failed to send an email');
-        console.log(err);
-        return;
-      }
+      if (err) return console.log(err);
       console.log(info.envelope);
       console.log(info.messageId);
     });
