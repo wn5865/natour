@@ -57,4 +57,12 @@ module.exports = class Email {
       'Your password reset token (valid for only 10 minutes)'
     );
   }
+
+  sendBookingSuccess() {
+    this.send('bookingSuccess', 'Your tour has been successfully booked');
+  }
+
+  sendBookingFail() {
+    this.send('bookingFail', 'Your booking failed');
+  }
 };

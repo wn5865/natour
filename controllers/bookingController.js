@@ -5,6 +5,7 @@ const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
+const Email = require('../utils/email');
 
 exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking);
@@ -130,17 +131,27 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   }
 
   const session = event.data.object;
-  try {
-    if (event.type === 'checkout.session.completed') {
-      await fulfillOrder(session);
-    }
-  } catch (err) {
-    // if a tour date has already been sold out, then refund
-    await stripe.refunds.create({ payment_intent: session.payment_intent });
-    return next(err);
-  }
+  const user = await User.findOne({ email: session.customer_email });
+  const email = new Email(user, '');
 
-  res.status(200).json({ received: true });
+  try {
+    // fulfill the order
+    await fulfillOrder(session);
+
+    // send an email that the tour has been successfully booked
+    email.sendBookingSuccess();
+
+    res.status(200).json({ received: true });
+  } catch (err) {
+    // if an error occurred, then refund the payment
+    await stripe.refunds.create({ payment_intent: session.payment_intent });
+
+    // and notify the user by email that his booking failed
+    email.sendBookingFail();
+
+    // respond with error message
+    return res.status(400).send(`Booking failed: ${err.message}`);
+  }
 });
 
 const fulfillOrder = async (session) => {
@@ -151,7 +162,7 @@ const fulfillOrder = async (session) => {
   // If sold out, throw an error
   if (date.soldOut) {
     throw new AppError(
-      'The tour on the date has already been sold out. Please try another date',
+      'The tour that starts on the date has already been sold out. Please try another date',
       400
     );
   }
