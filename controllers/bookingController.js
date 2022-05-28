@@ -136,7 +136,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 
   try {
     // fulfill the order
-    await fulfillOrder(session);
+    await fulfillOrder(session, user);
 
     // send an email that the tour has been successfully booked
     email.sendBookingSuccess();
@@ -154,7 +154,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   }
 });
 
-const fulfillOrder = async (session) => {
+const fulfillOrder = async (session, user) => {
   const [tourId, dateId] = session.client_reference_id.split('/');
   const tour = await Tour.findById(tourId);
   const date = tour.startDates.find((date) => date.id === dateId);
@@ -162,17 +162,16 @@ const fulfillOrder = async (session) => {
   // If sold out, throw an error
   if (date.soldOut) {
     throw new AppError(
-      'The tour that starts on the date has already been sold out. Please try another date',
+      'The tour that starts on the date has already been sold out. Please try another date.',
       400
     );
   }
 
-  // If not, increment the number of participants
+  // If not, increment the number of participants and save the tour info
   ++date.participants;
   if (date.participants === tour.maxGroupSize) date.soldOut = true;
   await tour.save();
 
-  const user = await User.findOne({ email: session.customer_email });
   const price = session.amount_total / 100;
   await Booking.create({ tour: tour.id, user: user.id, price });
 };
