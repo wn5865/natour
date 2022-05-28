@@ -173,5 +173,5 @@ const fulfillOrder = async (session, user) => {
   await tour.save();
 
   const price = session.amount_total / 100;
-  await Booking.create({ tour: date.id, date: dateId, user: user.id, price });
+  await Booking.create({ tour: tourId, date: dateId, user: user.id, price });
 };
