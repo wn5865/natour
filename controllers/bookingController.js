@@ -92,7 +92,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     client_reference_id: Object.values(req.params).join('/'),
     line_items: [
       {
-        name: `${tour.name} Tour (Date: ${dateStr})`,
+        name: `${tour.name} Tour (date: ${dateStr})`,
         description: tour.summary,
         images: [`${domain}/img/tours/${tour.imageCover}`],
         amount: tour.price * 100,
@@ -109,12 +109,16 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Webhook to be automatically notified from Stripe that a checkout has been
+ * completed sucessfully and then create a booking
+ */
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const payload = req.body;
   const signature = req.header('stripe-signature');
   let event;
 
-  // Validate
+  // Validate a session
   try {
     event = stripe.webhooks.constructEvent(
       payload,
@@ -125,15 +129,16 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
 
+  const session = event.data.object;
+
   try {
-    if (event.type !== 'checkout.session.completed') return;
-    await fulfillOrder(event.data.object);
+    if (event.type === 'checkout.session.completed') {
+      await fulfillOrder(session);
+    }
   } catch (err) {
-    // when a tour date has already been sold out, refund the payment
-    await stripe.refunds.create({
-      payment_intent: event.data.object.payment_intent,
-    });
-    throw err;
+    // if a tour date has already been sold out, then refund
+    await stripe.refunds.create({ payment_intent: session.payment_intent });
+    next(err);
   }
 
   res.status(200).json({ received: true });
@@ -144,17 +149,17 @@ const fulfillOrder = async (session) => {
   const tour = await Tour.findById(tourId);
   const date = tour.startDates.find((date) => date.id === dateId);
 
-  // Increment the number of participants
+  // If sold out, throw an error
   if (date.soldOut) {
     throw AppError(
-      'The tour date has already been sold out. Please try another date'
+      'The tour on the date has already been sold out. Please try another date',
+      400
     );
-  } else {
-    ++date.participants;
-    if (date.participants === tour.maxGroupSize) {
-      date.soldOut = true;
-    }
   }
+
+  // If not, increment the number of participants
+  ++date.participants;
+  if (date.participants === tour.maxGroupSize) date.soldOut = true;
   await tour.save();
 
   const user = await User.findOne({ email: session.customer_email });
