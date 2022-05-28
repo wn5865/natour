@@ -151,7 +151,7 @@ const fulfillOrder = async (session) => {
 
   // If sold out, throw an error
   if (date.soldOut) {
-    throw AppError(
+    throw new AppError(
       'The tour on the date has already been sold out. Please try another date',
       400
     );
