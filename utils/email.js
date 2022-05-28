@@ -42,6 +42,7 @@ module.exports = class Email {
 
     // 3) Create a transport and send email
     this.newTransport().sendMail(mailOptions, (err, info) => {
+      if (!info) return;
       console.log(info.envelope);
       console.log(info.messageId);
     });
