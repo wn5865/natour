@@ -5,6 +5,13 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('../controllers/handlerFactory');
 
+exports.getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
+
+// Do NOT update passwords with this!
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
+
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
 //     cb(null, 'public/img/users');
@@ -102,10 +109,3 @@ exports.createUser = (req, res) => {
     message: 'This route is not defined. Please use /signup instead',
   });
 };
-
-exports.getUser = factory.getOne(User);
-exports.getAllUsers = factory.getAll(User);
-
-// Do NOT update passwords with this!
-exports.updateUser = factory.updateOne(User);
-exports.deleteUser = factory.deleteOne(User);
