@@ -130,7 +130,6 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   }
 
   const session = event.data.object;
-
   try {
     if (event.type === 'checkout.session.completed') {
       await fulfillOrder(session);
@@ -138,7 +137,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   } catch (err) {
     // if a tour date has already been sold out, then refund
     await stripe.refunds.create({ payment_intent: session.payment_intent });
-    next(err);
+    return next(err);
   }
 
   res.status(200).json({ received: true });
