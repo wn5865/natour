@@ -1,5 +1,4 @@
 const Tour = require('../models/tourModel');
-const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -14,12 +13,19 @@ exports.alerts = (req, res, next) => {
 };
 
 exports.getOverview = catchAsync(async (req, res, next) => {
-  // 1) Get tour data from collection
   const tours = await Tour.find();
 
-  // 2) Build template
+  // Add date as a string to use in the template
+  tours.forEach((tour) => {
+    const date = tour.startDates[0].date;
+    const dateStr = new Date(date).toLocaleString('en-us', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    tour.dateStr = dateStr;
+  });
 
-  // 3) Render template using tour data
   res.status(200).render('overview', {
     title: 'All tours',
     tours,
@@ -27,7 +33,6 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  // 1) Get the data for the requested tour (including reviews and guides)
   const tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: 'reviews',
     fields: 'review rating user',
@@ -37,9 +42,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
     return next(new AppError('There is no tour with that name', 404));
   }
 
-  // 2) Build template
-
-  // 3) Render template
   res.status(200).render('tour', {
     title: tour.name,
     tour,
@@ -59,28 +61,27 @@ exports.getAccount = (req, res) => {
 };
 
 exports.getMyTours = catchAsync(async (req, res, next) => {
-  // 1) Find all bookings
   const bookings = await Booking.find({ user: req.user.id });
 
-  // 2) Find tours with the returned IDs
-  const tourIDs = bookings.map((el) => el.tour);
-  const tours = await Tour.find({ _id: { $in: tourIDs } });
+  // Get tours and date IDs
+  const tours = bookings.map((el) => el.tour);
+  const dateIDs = bookings.map((el) => el.date);
+
+  // Loop through the array to transform a date to string
+  for (let i = 0; i < tours.length; ++i) {
+    const tour = tours[i];
+    const dateId = dateIDs[i];
+    const date = tour.startDates.find((startDate) => startDate.id === dateId);
+    const dateStr = new Date(date.date).toLocaleString('en-us', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    tour.dateStr = dateStr;
+  }
 
   res.status(200).render('overview', {
     title: 'My Tours',
     tours,
   });
 });
-
-// exports.updateUserData = catchAsync(async (req, res) => {
-//   const updatedUser = await User.findByIdAndUpdate(
-//     req.user.id,
-//     { name: req.body.name, email: req.body.email },
-//     { new: true, runValidators: true }
-//   );
-
-//   res.status(200).render('account', {
-//     title: 'Your account',
-//     user: updatedUser,
-//   });
-// });
