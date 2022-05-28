@@ -16,6 +16,8 @@ router.use(authController.restrictTo('admin', 'lead-guide'));
 router
   .route('/')
   .get(bookingController.getAllBookings)
+  // Post method can get requests from user and tour router e.g.
+  // /user/:userId/bookings or /tour/:tourId/bookings
   .post(bookingController.setTourUserPrice, bookingController.createBooking);
 
 router
