@@ -15,15 +15,13 @@ exports.alerts = (req, res, next) => {
 exports.getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
 
-  // Add date as a string to use in the template
+  // Add date as a field after transforming to string
   tours.forEach((tour) => {
-    const date = tour.startDates[0].date;
-    const dateStr = new Date(date).toLocaleString('en-us', {
+    tour.dateStr = new Date(tour.startDates[0].date).toLocaleString('en-us', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
     });
-    tour.dateStr = dateStr;
   });
 
   res.status(200).render('overview', {
@@ -61,24 +59,24 @@ exports.getAccount = (req, res) => {
 };
 
 exports.getMyTours = catchAsync(async (req, res, next) => {
+  // Get all bookings from a user info
   const bookings = await Booking.find({ user: req.user.id });
 
   // Get tours and date IDs
-  const tours = bookings.map((el) => el.tour);
   const dateIDs = bookings.map((el) => el.date);
+  const tours = await Tour.aggregate([
+    { $unwind: '$startDates' },
+    { $match: { 'startDates._id': { $in: dateIDs } } },
+  ]);
 
   // Loop through the array to transform a date to string
-  for (let i = 0; i < tours.length; ++i) {
-    const tour = tours[i];
-    const dateId = dateIDs[i];
-    const date = tour.startDates.find((startDate) => startDate.id === dateId);
-    const dateStr = new Date(date.date).toLocaleString('en-us', {
+  tours.forEach((tour) => {
+    tour.dateStr = new Date(tour.startDates.date).toLocaleString('en-us', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
     });
-    tour.dateStr = dateStr;
-  }
+  });
 
   res.status(200).render('overview', {
     title: 'My Tours',

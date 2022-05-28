@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const pug = require('pug');
 const { convert } = require('html-to-text');
+const AppError = require('./appError');
 
 module.exports = class Email {
   constructor(user, url) {
@@ -40,9 +41,7 @@ module.exports = class Email {
 
     // 3) Create a transport and send email
     this.newTransport().sendMail(mailOptions, (err, info) => {
-      if (err) return console.log(err);
-      console.log(info.envelope);
-      console.log(info.messageId);
+      if (err) throw new AppError(err.message, 500);
     });
   }
 
