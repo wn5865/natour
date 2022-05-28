@@ -26,10 +26,7 @@ const bookingSchema = new mongoose.Schema({
   },
 });
 
-bookingSchema.pre(/^find/, function (next) {
-  this.populate('tour');
-  next();
-});
+bookingSchema.index({ tour: 1, date: 1, user: 1 }, { unique: true });
 
 const Booking = mongoose.model('booking', bookingSchema);
 module.exports = Booking;
