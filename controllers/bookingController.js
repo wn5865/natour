@@ -137,11 +137,6 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   try {
     // fulfill the order
     await fulfillOrder(session, user);
-
-    // send an email that the tour has been successfully booked
-    email.sendBookingSuccess();
-
-    res.status(200).json({ received: true });
   } catch (err) {
     // if an error occurred, then refund the payment
     await stripe.refunds.create({ payment_intent: session.payment_intent });
@@ -152,6 +147,11 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
     // respond with error message
     return res.status(400).send(`Booking failed: ${err.message}`);
   }
+
+  // send an email that the tour has been successfully booked
+  email.sendBookingSuccess();
+
+  res.status(200).json({ received: true });
 });
 
 const fulfillOrder = async (session, user) => {
