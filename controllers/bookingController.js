@@ -13,8 +13,8 @@ exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
 
 /**
- * Checks if the current user has actually booked a tour.
- * Prevents a user from writing reviews without booking.
+ * Middleware to check if the current user has actually booked a tour
+ * in order to prevent a user from writing reviews without booking.
  */
 exports.checkIfBooked = catchAsync(async (req, res, next) => {
   const booking = await Booking.findOne({
@@ -72,6 +72,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(tourId);
   const date = tour.startDates.find((date) => date.id === dateId);
 
+  if (date.soldOut) {
+    return next(new AppError('The tour has already been sold out', 404));
+  }
+
   // 2) Create checkout session
   const domain = `${req.protocol}://${req.header('host')}`;
   const dateStr = new Date(date.date).toLocaleDateString('en-US', {
@@ -110,6 +114,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const signature = req.header('stripe-signature');
   let event;
 
+  // Validate
   try {
     event = stripe.webhooks.constructEvent(
       payload,
@@ -117,13 +122,20 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    // case that session verification fails
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
 
-  if (event.type === 'checkout.session.completed') {
+  try {
+    if (event.type !== 'checkout.session.completed') return;
     await fulfillOrder(event.data.object);
+  } catch (err) {
+    // when a tour date has already been sold out, refund the payment
+    await stripe.refunds.create({
+      payment_intent: event.data.object.payment_intent,
+    });
+    throw err;
   }
+
   res.status(200).json({ received: true });
 });
 
