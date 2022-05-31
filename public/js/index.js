@@ -1,6 +1,6 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import { login, logout } from './login.js';
+import { login, signup, logout } from './login.js';
 import { displayMap } from './mapbox.js';
 import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe';
@@ -8,6 +8,7 @@ import { showAlert } from './alerts.js';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
+const signupForm = document.querySelector('.signup-form > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -20,11 +21,16 @@ if (mapBox) {
 }
 
 if (loginForm) {
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    login(email, password);
+    login(new FormData(this));
+  });
+}
+
+if (signupForm) {
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    signup(new FormData(this));
   });
 }
 
@@ -35,8 +41,7 @@ if (logOutBtn) {
 if (userDataForm) {
   userDataForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    const form = new FormData(this);
-    updateSettings(form, 'data');
+    updateSettings(new FormData(this), 'data');
   });
 }
 

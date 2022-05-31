@@ -34,6 +34,7 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  // Create a new user
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -41,12 +42,17 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
   });
+
+  // Send a welcome email
   const url = `${req.protocol}://${req.header('host')}/me`;
-  await new Email(newUser, url).sendWelcome();
+  new Email(newUser, url).sendWelcome();
+
+  // Create and send a JWT with response
   createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
+  console.log(req.body);
   const { email, password } = req.body;
 
   // 1) check if email and password actually exists

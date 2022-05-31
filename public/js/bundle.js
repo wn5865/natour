@@ -535,6 +535,7 @@ var _stripe = require("./stripe");
 var _alertsJs = require("./alerts.js");
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
+const signupForm = document.querySelector('.signup-form > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -544,17 +545,18 @@ if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     _mapboxJs.displayMap(locations);
 }
-if (loginForm) loginForm.addEventListener('submit', (e)=>{
+if (loginForm) loginForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    _loginJs.login(email, password);
+    _loginJs.login(new FormData(this));
+});
+if (signupForm) signupForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    _loginJs.signup(new FormData(this));
 });
 if (logOutBtn) logOutBtn.addEventListener('click', _loginJs.logout);
 if (userDataForm) userDataForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const form = new FormData(this);
-    _updateSettingsJs.updateSettings(form, 'data');
+    _updateSettingsJs.updateSettings(new FormData(this), 'data');
 });
 if (userPasswordForm) userPasswordForm.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -15280,23 +15282,39 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login
 );
+parcelHelpers.export(exports, "signup", ()=>signup
+);
 parcelHelpers.export(exports, "logout", ()=>logout
 );
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alertsJs = require("./alerts.js");
-const login = async (email, password)=>{
+const login = async (form)=>{
     try {
-        const res = await _axiosDefault.default({
-            method: 'POST',
-            url: 'api/v1/users/login',
-            data: {
-                email,
-                password
-            }
+        const res = await _axiosDefault.default.post('api/v1/users/login', {
+            email: form.get('email'),
+            password: form.get('password')
         });
         if (res.data.status === 'success') {
             _alertsJs.showAlert('success', 'Logged in successfully');
+            setTimeout(()=>{
+                location.assign('/');
+            }, 1500);
+        }
+    } catch (err) {
+        _alertsJs.showAlert('error', err.response.data.message);
+    }
+};
+const signup = async (form)=>{
+    try {
+        const res = await _axiosDefault.default.post('api/v1/users/signup', {
+            name: form.get('name'),
+            email: form.get('email'),
+            password: form.get('password'),
+            passwordConfirm: form.get('password-confirm')
+        });
+        if (res.data.status === 'success') {
+            _alertsJs.showAlert('success', 'Signed up successfully');
             setTimeout(()=>{
                 location.assign('/');
             }, 1500);
