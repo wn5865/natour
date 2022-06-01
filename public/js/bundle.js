@@ -537,6 +537,8 @@ var _review = require("./review");
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
+const reviewWriteBtn = document.querySelector('.reviews__write-btn');
+const modalBox = document.querySelector('.modal');
 const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
@@ -576,7 +578,15 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', async function
     saveBtn.textContent = 'SAVE password';
     this.reset();
 });
-if (reviewForm) {
+if (reviewWriteBtn) {
+    // When user clicks write button, open modal box
+    reviewWriteBtn.addEventListener('click', (e)=>{
+        modalBox.style.display = 'block';
+    });
+    // When user clicks anywhere else, close modal box
+    window.addEventListener('click', (e)=>{
+        if (e.target === modalBox) modalBox.style.display = 'none';
+    });
     const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
     let rating = document.getElementById('rating');
     // Implement interactive color change of rating stars
@@ -602,6 +612,8 @@ if (reviewForm) {
         if (!form.get('rating')) return _alertsJs.showAlert('error', 'Please rate this tour');
         if (!form.get('review')) return _alertsJs.showAlert('error', 'Please write your review');
         _review.writeReview(form);
+        modalBox.style.display = 'none';
+        this.reset();
     });
 }
 if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {

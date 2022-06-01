@@ -10,6 +10,8 @@ import { writeReview } from './review';
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
+const reviewWriteBtn = document.querySelector('.reviews__write-btn');
+const modalBox = document.querySelector('.modal');
 const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
@@ -66,7 +68,19 @@ if (userPasswordForm) {
   });
 }
 
-if (reviewForm) {
+if (reviewWriteBtn) {
+  // When user clicks write button, open modal box
+  reviewWriteBtn.addEventListener('click', (e) => {
+    modalBox.style.display = 'block';
+  });
+
+  // When user clicks anywhere else, close modal box
+  window.addEventListener('click', (e) => {
+    if (e.target === modalBox) {
+      modalBox.style.display = 'none';
+    }
+  });
+
   const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
   let rating = document.getElementById('rating');
 
@@ -100,6 +114,9 @@ if (reviewForm) {
     }
 
     writeReview(form);
+
+    modalBox.style.display = 'none';
+    this.reset();
   });
 }
 

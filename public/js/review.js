@@ -8,8 +8,9 @@ export const writeReview = async (form) => {
       review: form.get('review'),
       rating: form.get('rating'),
     });
-    if (res.data.status === 'success')
+    if (res.data.status === 'success') {
       showAlert('success', 'Your review has been posted');
+    }
   } catch (err) {
     showAlert('error', err.response.data.message);
   }
