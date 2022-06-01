@@ -1,9 +1,5 @@
 const Review = require('../models/reviewModel');
-const User = require('../models/userModel');
-const Tour = require('../models/tourModel');
-const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const factory = require('../controllers/handlerFactory');
 
 /**
@@ -13,7 +9,6 @@ exports.setTourUserIds = catchAsync(async (req, res, next) => {
   // Set user and tour IDs
   if (!req.body.user) req.body.user = req.user.id;
   if (!req.body.tour) req.body.tour = req.params.tourId;
-
   next();
 });
 

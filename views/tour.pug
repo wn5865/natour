@@ -71,7 +71,7 @@ block content
     .reviews
       each review in tour.reviews
         +reviewCard(review)
-
+  
   section.section-cta
     .cta
       .cta__img.cta__img--logo
@@ -91,3 +91,22 @@ block content
           button.btn.btn--green#book-tour Book tour now!
         else
           a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
+
+  if user.role === 'user'
+    section.modal
+      .review
+        .review__content
+          h2.heading-secondary Write your review
+          form.form
+            input.form__input(name='tourId', type='hidden', value=`${tour.id}`)
+            .form__group
+              label.form__label(for='rating') Rate this tour
+              .review__rating
+                each i in [0, 1, 2, 3, 4]
+                  svg.reviews__star.reviews__star--inactive(data-id=`${i}`)
+                    use(xlink:href='/img/icons.svg#icon-star')
+              input#rating.form__input(name='rating', type='hidden', required)
+            .form__group
+              textarea.form__input.form__textarea(name='review', placeholder="Share your experience with this tour!", required) 
+            .form__group
+              button.btn.btn--green Submit

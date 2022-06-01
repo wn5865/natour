@@ -533,9 +533,11 @@ var _mapboxJs = require("./mapbox.js");
 var _updateSettingsJs = require("./updateSettings.js");
 var _stripe = require("./stripe");
 var _alertsJs = require("./alerts.js");
+var _review = require("./review");
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
+const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -572,6 +574,34 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', async function
     document.querySelector('.btn--save-password').textContent = 'SAVE password';
     this.reset();
 });
+if (reviewForm) {
+    const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
+    let rating = document.getElementById('rating');
+    // Implement interactive color change of rating stars
+    stars.forEach((star1)=>{
+        const id = Number(star1.dataset.id);
+        star1.addEventListener('click', ()=>{
+            rating.value = id + 1;
+            stars.forEach((star, i)=>{
+                if (i <= id) {
+                    star.classList.remove('reviews__star--inactive');
+                    star.classList.add('reviews__star--active');
+                } else {
+                    star.classList.add('reviews__star--inactive');
+                    star.classList.remove('reviews__star--active');
+                }
+            });
+        });
+    });
+    // Implement review submit
+    reviewForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = new FormData(this);
+        if (!form.get('rating')) return _alertsJs.showAlert('error', 'Please rate this tour');
+        if (!form.get('review')) return _alertsJs.showAlert('error', 'Please write your review');
+        _review.writeReview(form);
+    });
+}
 if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
     const btnText = this.textContent;
     this.textContent = 'Processing...';
@@ -586,7 +616,7 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
 
-},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto"}],"56xpM":[function(require,module,exports) {
+},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH"}],"56xpM":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -47965,6 +47995,27 @@ const bookTour = async (tourId, dateId)=>{
     }
 };
 
-},{"axios":"ddOxJ","./alerts.js":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
+},{"axios":"ddOxJ","./alerts.js":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}],"jLAJH":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "writeReview", ()=>writeReview
+);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _alerts = require("./alerts");
+const writeReview = async (form)=>{
+    try {
+        const tourId = form.get('tourId');
+        const res = await _axiosDefault.default.post(`/api/v1/tours/${tourId}/reviews`, {
+            review: form.get('review'),
+            rating: form.get('rating')
+        });
+        if (res.data.status === 'success') _alerts.showAlert('success', 'Your review has been posted');
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+
+},{"axios":"ddOxJ","./alerts":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
 
 //# sourceMappingURL=bundle.js.map

@@ -5,10 +5,12 @@ import { displayMap } from './mapbox.js';
 import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts.js';
+import { writeReview } from './review';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
+const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -58,6 +60,43 @@ if (userPasswordForm) {
     );
     document.querySelector('.btn--save-password').textContent = 'SAVE password';
     this.reset();
+  });
+}
+
+if (reviewForm) {
+  const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
+  let rating = document.getElementById('rating');
+
+  // Implement interactive color change of rating stars
+  stars.forEach((star) => {
+    const id = Number(star.dataset.id);
+    star.addEventListener('click', () => {
+      rating.value = id + 1;
+      stars.forEach((star, i) => {
+        if (i <= id) {
+          star.classList.remove('reviews__star--inactive');
+          star.classList.add('reviews__star--active');
+        } else {
+          star.classList.add('reviews__star--inactive');
+          star.classList.remove('reviews__star--active');
+        }
+      });
+    });
+  });
+
+  // Implement review submit
+  reviewForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = new FormData(this);
+
+    if (!form.get('rating')) {
+      return showAlert('error', 'Please rate this tour');
+    }
+    if (!form.get('review')) {
+      return showAlert('error', 'Please write your review');
+    }
+
+    writeReview(form);
   });
 }
 

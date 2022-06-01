@@ -1331,3 +1331,42 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+.form__textarea {
+  resize: none;
+}
+
+/* REVIEW SECTION */
+.modal {
+  padding: 11rem 2rem;
+  background-color: #f7f7f7;
+}
+
+.review {
+  position: relative;
+  max-width: 50rem;
+  margin: 0 auto;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 9rem 5rem;
+  border-radius: 2rem;
+  -webkit-box-shadow: 0 3rem 8rem 0.5rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3rem 8rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.review__content {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-gap: 1rem;
+  grid-auto-flow: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.review__rating:hover .reviews__star {
+  fill: #55c57a;
+}
+
+.review__rating .reviews__star:hover ~ .reviews__star {
+  fill: #bbb;
+}
