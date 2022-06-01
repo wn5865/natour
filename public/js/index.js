@@ -50,15 +50,18 @@ if (userDataForm) {
 if (userPasswordForm) {
   userPasswordForm.addEventListener('submit', async function (e) {
     e.preventDefault();
-    document.querySelector('.btn--save-password').textContent = 'Updating...';
-    const currentPassword = document.getElementById('password-current').value;
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('password-confirm').value;
+    const saveBtn = document.querySelector('.btn--save-password');
+    saveBtn.textContent = 'Updating...';
+    const form = new FormData(this);
+    const currentPassword = form.get('password-current');
+    const password = form.get('password');
+    const passwordConfirm = form.get('password-confirm');
+
     await updateSettings(
       { currentPassword, password, passwordConfirm },
       'password'
     );
-    document.querySelector('.btn--save-password').textContent = 'SAVE password';
+    saveBtn.textContent = 'SAVE password';
     this.reset();
   });
 }
