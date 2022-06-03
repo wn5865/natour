@@ -32,7 +32,7 @@ const importData = async () => {
     process.env.NODE_ENV = 'import';
     await Tour.create(tours);
     await User.create(users, { validateBeforeSave: false });
-    await Review.create(reviews);
+    await Review.create(reviews, { validateBeforeSave: false });
     console.log('data successfully loaded');
   } catch (err) {
     console.log(err);

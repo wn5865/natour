@@ -1,0 +1,28 @@
+extends base
+
+block content
+  section.section-cta
+    .review
+      .review__content
+        h2.heading-secondary Write your review
+        form.form
+          if review._id
+            input.form__input(name='reviewId', type='hidden', value=`${review._id}`)
+          else
+            input.form__input(name='tourId', type='hidden', value=`${review.tour}`)
+            input.form__input(name='dateId', type='hidden', value=`${review.date}`)
+            input.form__input(name='userId', type='hidden', value=`${review.user}`)
+          .form__group
+            label.form__label Rate this tour
+            input#rating.form__input(name='rating', type='hidden', required)
+            - if (review.rating) document.getElementById('rating').value = review.rating
+            .review__rating
+              each i in [0, 1, 2, 3, 4]
+                - const active = 'reviews__star--' + (i < review.rating ? '' : 'in') + 'active';
+                svg.reviews__star(class=`${active}`, data-id=`${i}`)
+                  use(xlink:href='/img/icons.svg#icon-star')
+          .form__group
+            textarea.form__input.form__textarea(name='review', placeholder="Share your experience with this tour!", required)= review.review
+          .form__group
+            - const btnText = review._id ? 'Update' : 'Submit';
+            button.btn.btn--green= btnText

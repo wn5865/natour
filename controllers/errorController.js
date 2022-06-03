@@ -7,7 +7,7 @@ module.exports = (err, req, res, next) => {
   const env = process.env.NODE_ENV;
 
   if (env === 'development') {
-    sendErrorDev(error, req, res);
+    sendErrorDev(err, req, res);
   } else if (env === 'production') {
     if (err.name === 'CastError') error = handleCastErrorDB(err);
     if (err.code === 11000) error = handleDuplicateFieldsDB(err);

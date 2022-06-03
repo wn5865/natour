@@ -10,9 +10,8 @@ import { writeReview } from './review';
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
-const reviewWriteBtn = document.querySelector('.reviews__write-btn');
-const modalBox = document.querySelector('.modal');
 const reviewForm = document.querySelector('.review__content > .form');
+const modalBox = document.querySelector('.modal');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -68,23 +67,11 @@ if (userPasswordForm) {
   });
 }
 
-if (reviewWriteBtn) {
-  // When user clicks write button, open modal box
-  reviewWriteBtn.addEventListener('click', (e) => {
-    modalBox.style.display = 'block';
-  });
-
-  // When user clicks anywhere else, close modal box
-  window.addEventListener('click', (e) => {
-    if (e.target === modalBox) {
-      modalBox.style.display = 'none';
-    }
-  });
-
+if (reviewForm) {
   const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
   let rating = document.getElementById('rating');
 
-  // Implement interactive color change of rating stars
+  // Implement interactive color change of rating stars on click
   stars.forEach((star) => {
     const id = Number(star.dataset.id);
     star.addEventListener('click', () => {
@@ -115,8 +102,9 @@ if (reviewWriteBtn) {
 
     writeReview(form);
 
-    modalBox.style.display = 'none';
-    this.reset();
+    setTimeout(() => {
+      history.back();
+    }, 3000);
   });
 }
 

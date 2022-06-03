@@ -537,9 +537,8 @@ var _review = require("./review");
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
-const reviewWriteBtn = document.querySelector('.reviews__write-btn');
-const modalBox = document.querySelector('.modal');
 const reviewForm = document.querySelector('.review__content > .form');
+const modalBox = document.querySelector('.modal');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -578,18 +577,10 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', async function
     saveBtn.textContent = 'SAVE password';
     this.reset();
 });
-if (reviewWriteBtn) {
-    // When user clicks write button, open modal box
-    reviewWriteBtn.addEventListener('click', (e)=>{
-        modalBox.style.display = 'block';
-    });
-    // When user clicks anywhere else, close modal box
-    window.addEventListener('click', (e)=>{
-        if (e.target === modalBox) modalBox.style.display = 'none';
-    });
+if (reviewForm) {
     const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
     let rating = document.getElementById('rating');
-    // Implement interactive color change of rating stars
+    // Implement interactive color change of rating stars on click
     stars.forEach((star1)=>{
         const id = Number(star1.dataset.id);
         star1.addEventListener('click', ()=>{
@@ -612,8 +603,9 @@ if (reviewWriteBtn) {
         if (!form.get('rating')) return _alertsJs.showAlert('error', 'Please rate this tour');
         if (!form.get('review')) return _alertsJs.showAlert('error', 'Please write your review');
         _review.writeReview(form);
-        modalBox.style.display = 'none';
-        this.reset();
+        setTimeout(()=>{
+            history.back();
+        }, 3000);
     });
 }
 if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
@@ -48019,12 +48011,28 @@ var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
 const writeReview = async (form)=>{
     try {
-        const tourId = form.get('tourId');
-        const res = await _axiosDefault.default.post(`/api/v1/tours/${tourId}/reviews`, {
+        let res;
+        const update = {
             review: form.get('review'),
             rating: form.get('rating')
-        });
-        if (res.data.status === 'success') _alerts.showAlert('success', 'Your review has been posted');
+        };
+        if (form.has('reviewId')) {
+            // if the review already exists in DB, update
+            console.log('updated...');
+            res = await _axiosDefault.default.patch(`/api/v1/reviews/${form.get('reviewId')}`, update);
+        } else {
+            // else, create one
+            const ids = {
+                tour: form.get('tourId'),
+                date: form.get('dateId'),
+                user: form.get('userId')
+            };
+            res = await _axiosDefault.default.post('/api/v1/reviews', Object.assign(ids, update));
+        }
+        if (res.data.status === 'success') {
+            const message = 'Your review has been ' + (res.status === 201 ? 'posted' : 'updated');
+            _alerts.showAlert('success', message);
+        }
     } catch (err) {
         _alerts.showAlert('error', err.response.data.message);
     }
