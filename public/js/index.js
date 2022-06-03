@@ -15,7 +15,6 @@ const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
-const savePasswordBtn = document.querySelector('.btn--save-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 

@@ -36,8 +36,7 @@ block content
       div
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
-          - const date = tour.startDates[0].date.toLocaleString('en-US', { month: 'long', year: 'numeric'})
-          +overviewBox('Next date', date, 'calendar')
+          +overviewBox('Next date', dates[0].date, 'calendar')
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
           +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
           +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
@@ -84,10 +83,8 @@ block content
         if user
           select.btn.cta__select(id='date', data-tour-id=`${tour.id}`)
             option(value='') Select start date!
-            each date in tour.startDates
-              - if (date.participants < tour.maxGroupSize)
-                - const dateStr = date.date.toLocaleString('en-us', {day: 'numeric', month: 'long', year: 'numeric'})
-                option(value=`${date.id}`)= dateStr
+            each date in dates
+              option(value=`${date.id}`)= date.date
           button.btn.btn--green#book-tour Book tour now!
         else
           a.btn.btn--green.span-all-rows(href='/login') Log in to book tour

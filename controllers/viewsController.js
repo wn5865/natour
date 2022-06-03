@@ -15,35 +15,36 @@ exports.alerts = (req, res, next) => {
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
-
-  // Add date as a field after transforming to string
-  tours.forEach((tour) => {
-    tour.dateStr = new Date(tour.startDates[0].date).toLocaleString('en-us', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  });
+  const dates = tours.map((tour) => tour.datesToString()[0].date);
 
   res.status(200).render('overview', {
     title: 'All tours',
     tours,
+    dates,
   });
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findOne({ slug: req.params.slug }).populate({
+  let tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: 'reviews',
     fields: 'review rating user',
   });
-
   if (!tour) {
     return next(new AppError('There is no tour with that name', 404));
+  }
+
+  if (req.user) {
+    const bookings = await Booking.find({ tour: tour._id, user: req.user._id });
+    const dateIDs = bookings.map((booking) => booking.date.toString());
+    tour.startDates = tour.startDates
+      .filter((date) => date.participants < tour.maxGroupSize)
+      .filter((date) => !dateIDs.includes(date.id));
   }
 
   res.status(200).render('tour', {
     title: tour.name,
     tour,
+    dates: tour.datesToString(),
   });
 });
 

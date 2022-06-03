@@ -3,7 +3,9 @@ extends base
 block content
   main.main 
     .card-container
-      each tour in tours
+      - for (let i = 0; i < tours.length; ++i)
+        - const tour = tours[i];
+        - const date = dates[i];
         .card
           .card__header
             .card__picture
@@ -22,7 +24,7 @@ block content
             .card__data
               svg.card__icon
                 use(xlink:href='img/icons.svg#icon-calendar')
-              span= tour.dateStr
+              span= date
             .card__data
               svg.card__icon
                 use(xlink:href='img/icons.svg#icon-flag')
