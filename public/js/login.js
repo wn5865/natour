@@ -1,12 +1,9 @@
 import axios from 'axios';
 import { showAlert } from './alerts.js';
 
-export const login = async (form) => {
+export const login = async (data) => {
   try {
-    const res = await axios.post('api/v1/users/login', {
-      email: form.get('email'),
-      password: form.get('password'),
-    });
+    const res = await axios.post('api/v1/users/login', data);
 
     if (res.data.status === 'success') {
       showAlert('success', 'Logged in successfully');
@@ -19,14 +16,9 @@ export const login = async (form) => {
   }
 };
 
-export const signup = async (form) => {
+export const signup = async (data) => {
   try {
-    const res = await axios.post('api/v1/users/signup', {
-      name: form.get('name'),
-      email: form.get('email'),
-      password: form.get('password'),
-      passwordConfirm: form.get('password-confirm'),
-    });
+    const res = await axios.post('api/v1/users/signup', data);
 
     if (res.data.status === 'success') {
       showAlert('success', 'Signed up successfully');

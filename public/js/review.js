@@ -1,35 +1,21 @@
 import axios from 'axios';
 import { showAlert } from './alerts';
 
-export const writeReview = async (form) => {
+export const writeReview = async (data) => {
   try {
-    let res;
-    const update = {
-      review: form.get('review'),
-      rating: form.get('rating'),
-    };
+    if (!Number(data.rating))
+      return showAlert('error', 'Please rate this tour');
 
-    if (form.has('reviewId')) {
-      // if the review already exists in DB, update
-      console.log('updated...');
-      res = await axios.patch(
-        `/api/v1/reviews/${form.get('reviewId')}`,
-        update
-      );
-    } else {
-      // else, create one
-      const ids = {
-        tour: form.get('tourId'),
-        date: form.get('dateId'),
-        user: form.get('userId'),
-      };
-      res = await axios.post('/api/v1/reviews', Object.assign(ids, update));
-    }
+    // If the review already exists in DB, update. Else, create one
+    let res = data.reviewId
+      ? await axios.patch(`/api/v1/reviews/${data.reviewId}`, data)
+      : await axios.post('/api/v1/reviews', data);
 
     if (res.data.status === 'success') {
       const message =
         'Your review has been ' + (res.status === 201 ? 'posted' : 'updated');
       showAlert('success', message);
+      setTimeout(() => history.back(), 3000);
     }
   } catch (err) {
     showAlert('error', err.response.data.message);

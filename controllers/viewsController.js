@@ -94,10 +94,7 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
 exports.getReviewForm = catchAsync(async (req, res, next) => {
   const user = req.user.id;
   const { tourId: tour, dateId: date } = req.params;
-  let review = await Review.findOne({ tour, date, user });
-  if (!review) {
-    review = { tour, date, user };
-  }
-
+  const IDs = { user, tour, date };
+  const review = (await Review.findOne(IDs)) || IDs;
   res.status(200).render('reviewForm', { title: 'Review', review });
 });

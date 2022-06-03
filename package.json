@@ -18,7 +18,7 @@
     "dev": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
     "debug": "ndb serverjs",
-    "watch:js": "parcel watch --log-level verbose --no-cache",
+    "watch:js": "parcel watch",
     "build:js": "parcel build"
   },
   "author": "",

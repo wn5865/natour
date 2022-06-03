@@ -534,48 +534,31 @@ var _updateSettingsJs = require("./updateSettings.js");
 var _stripe = require("./stripe");
 var _alertsJs = require("./alerts.js");
 var _review = require("./review");
+var _formHandlerJs = require("./formHandler.js");
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
 const reviewForm = document.querySelector('.review__content > .form');
-const modalBox = document.querySelector('.modal');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const savePasswordBtn = document.querySelector('.btn--save-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     _mapboxJs.displayMap(locations);
 }
-if (loginForm) loginForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    _loginJs.login(new FormData(this));
-});
-if (signupForm) signupForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    _loginJs.signup(new FormData(this));
-});
+if (loginForm) loginForm.addEventListener('submit', (e)=>_loginJs.login(_formHandlerJs.handleForm(e))
+);
+if (signupForm) signupForm.addEventListener('submit', (e)=>_loginJs.signup(_formHandlerJs.handleForm(e))
+);
 if (logOutBtn) logOutBtn.addEventListener('click', _loginJs.logout);
-if (userDataForm) userDataForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    _updateSettingsJs.updateSettings(new FormData(this), 'data');
-});
-if (userPasswordForm) userPasswordForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const saveBtn = document.querySelector('.btn--save-password');
-    saveBtn.textContent = 'Updating...';
-    const form = new FormData(this);
-    const currentPassword = form.get('password-current');
-    const password = form.get('password');
-    const passwordConfirm = form.get('password-confirm');
-    await _updateSettingsJs.updateSettings({
-        currentPassword,
-        password,
-        passwordConfirm
-    }, 'password');
-    saveBtn.textContent = 'SAVE password';
-    this.reset();
+if (userDataForm) userDataForm.addEventListener('submit', (e)=>_updateSettingsJs.updateSettings(_formHandlerJs.handleForm(e), 'data')
+);
+if (userPasswordForm) userPasswordForm.addEventListener('submit', async (e)=>{
+    await _updateSettingsJs.updateSettings(_formHandlerJs.handleForm(e), 'password');
+    e.target.reset();
 });
 if (reviewForm) {
     const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
@@ -586,27 +569,14 @@ if (reviewForm) {
         star1.addEventListener('click', ()=>{
             rating.value = id + 1;
             stars.forEach((star, i)=>{
-                if (i <= id) {
-                    star.classList.remove('reviews__star--inactive');
-                    star.classList.add('reviews__star--active');
-                } else {
-                    star.classList.add('reviews__star--inactive');
-                    star.classList.remove('reviews__star--active');
-                }
+                star.class = 'reviews__star';
+                i <= id ? star.classList.add('reviews__star--active') : star.classList.add('reviews__star--inactive');
             });
         });
     });
     // Implement review submit
-    reviewForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const form = new FormData(this);
-        if (!form.get('rating')) return _alertsJs.showAlert('error', 'Please rate this tour');
-        if (!form.get('review')) return _alertsJs.showAlert('error', 'Please write your review');
-        _review.writeReview(form);
-        setTimeout(()=>{
-            history.back();
-        }, 3000);
-    });
+    reviewForm.addEventListener('submit', (e)=>_review.writeReview(_formHandlerJs.handleForm(e))
+    );
 }
 if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
     const btnText = this.textContent;
@@ -622,7 +592,7 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
 
-},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH"}],"56xpM":[function(require,module,exports) {
+},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp"}],"56xpM":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -15325,12 +15295,9 @@ parcelHelpers.export(exports, "logout", ()=>logout
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alertsJs = require("./alerts.js");
-const login = async (form)=>{
+const login = async (data)=>{
     try {
-        const res = await _axiosDefault.default.post('api/v1/users/login', {
-            email: form.get('email'),
-            password: form.get('password')
-        });
+        const res = await _axiosDefault.default.post('api/v1/users/login', data);
         if (res.data.status === 'success') {
             _alertsJs.showAlert('success', 'Logged in successfully');
             setTimeout(()=>{
@@ -15341,14 +15308,9 @@ const login = async (form)=>{
         _alertsJs.showAlert('error', err.response.data.message);
     }
 };
-const signup = async (form)=>{
+const signup = async (data)=>{
     try {
-        const res = await _axiosDefault.default.post('api/v1/users/signup', {
-            name: form.get('name'),
-            email: form.get('email'),
-            password: form.get('password'),
-            passwordConfirm: form.get('password-confirm')
-        });
+        const res = await _axiosDefault.default.post('api/v1/users/signup', data);
         if (res.data.status === 'success') {
             _alertsJs.showAlert('success', 'Signed up successfully');
             setTimeout(()=>{
@@ -48009,35 +47971,34 @@ parcelHelpers.export(exports, "writeReview", ()=>writeReview
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
-const writeReview = async (form)=>{
+const writeReview = async (data)=>{
     try {
-        let res;
-        const update = {
-            review: form.get('review'),
-            rating: form.get('rating')
-        };
-        if (form.has('reviewId')) {
-            // if the review already exists in DB, update
-            console.log('updated...');
-            res = await _axiosDefault.default.patch(`/api/v1/reviews/${form.get('reviewId')}`, update);
-        } else {
-            // else, create one
-            const ids = {
-                tour: form.get('tourId'),
-                date: form.get('dateId'),
-                user: form.get('userId')
-            };
-            res = await _axiosDefault.default.post('/api/v1/reviews', Object.assign(ids, update));
-        }
+        if (!Number(data.rating)) return _alerts.showAlert('error', 'Please rate this tour');
+        // If the review already exists in DB, update. Else, create one
+        let res = data.reviewId ? await _axiosDefault.default.patch(`/api/v1/reviews/${data.reviewId}`, data) : await _axiosDefault.default.post('/api/v1/reviews', data);
         if (res.data.status === 'success') {
             const message = 'Your review has been ' + (res.status === 201 ? 'posted' : 'updated');
             _alerts.showAlert('success', message);
+            setTimeout(()=>history.back()
+            , 3000);
         }
     } catch (err) {
         _alerts.showAlert('error', err.response.data.message);
     }
 };
 
-},{"axios":"ddOxJ","./alerts":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
+},{"axios":"ddOxJ","./alerts":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}],"loIAp":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "handleForm", ()=>handleForm
+);
+const handleForm = function(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+    return data;
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
 
 //# sourceMappingURL=bundle.js.map

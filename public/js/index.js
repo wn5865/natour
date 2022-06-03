@@ -6,15 +6,16 @@ import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts.js';
 import { writeReview } from './review';
+import { handleForm } from './formHandler.js';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
 const reviewForm = document.querySelector('.review__content > .form');
-const modalBox = document.querySelector('.modal');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const savePasswordBtn = document.querySelector('.btn--save-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 
@@ -24,17 +25,11 @@ if (mapBox) {
 }
 
 if (loginForm) {
-  loginForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    login(new FormData(this));
-  });
+  loginForm.addEventListener('submit', (e) => login(handleForm(e)));
 }
 
 if (signupForm) {
-  signupForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    signup(new FormData(this));
-  });
+  signupForm.addEventListener('submit', (e) => signup(handleForm(e)));
 }
 
 if (logOutBtn) {
@@ -42,28 +37,15 @@ if (logOutBtn) {
 }
 
 if (userDataForm) {
-  userDataForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    updateSettings(new FormData(this), 'data');
-  });
+  userDataForm.addEventListener('submit', (e) =>
+    updateSettings(handleForm(e), 'data')
+  );
 }
 
 if (userPasswordForm) {
-  userPasswordForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const saveBtn = document.querySelector('.btn--save-password');
-    saveBtn.textContent = 'Updating...';
-    const form = new FormData(this);
-    const currentPassword = form.get('password-current');
-    const password = form.get('password');
-    const passwordConfirm = form.get('password-confirm');
-
-    await updateSettings(
-      { currentPassword, password, passwordConfirm },
-      'password'
-    );
-    saveBtn.textContent = 'SAVE password';
-    this.reset();
+  userPasswordForm.addEventListener('submit', async (e) => {
+    await updateSettings(handleForm(e), 'password');
+    e.target.reset();
   });
 }
 
@@ -77,35 +59,16 @@ if (reviewForm) {
     star.addEventListener('click', () => {
       rating.value = id + 1;
       stars.forEach((star, i) => {
-        if (i <= id) {
-          star.classList.remove('reviews__star--inactive');
-          star.classList.add('reviews__star--active');
-        } else {
-          star.classList.add('reviews__star--inactive');
-          star.classList.remove('reviews__star--active');
-        }
+        star.class = 'reviews__star';
+        i <= id
+          ? star.classList.add('reviews__star--active')
+          : star.classList.add('reviews__star--inactive');
       });
     });
   });
 
   // Implement review submit
-  reviewForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const form = new FormData(this);
-
-    if (!form.get('rating')) {
-      return showAlert('error', 'Please rate this tour');
-    }
-    if (!form.get('review')) {
-      return showAlert('error', 'Please write your review');
-    }
-
-    writeReview(form);
-
-    setTimeout(() => {
-      history.back();
-    }, 3000);
-  });
+  reviewForm.addEventListener('submit', (e) => writeReview(handleForm(e)));
 }
 
 if (bookBtn && dateOption) {

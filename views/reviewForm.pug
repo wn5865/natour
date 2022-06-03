@@ -1,5 +1,8 @@
 extends base
 
+mixin hiddenInput(name, value)
+  input.form__input(name=`${name}`, type='hidden', value=`${value}`)
+
 block content
   section.section-cta
     .review
@@ -7,15 +10,14 @@ block content
         h2.heading-secondary Write your review
         form.form
           if review._id
-            input.form__input(name='reviewId', type='hidden', value=`${review._id}`)
+            +hiddenInput('reviewId', review._id)
           else
-            input.form__input(name='tourId', type='hidden', value=`${review.tour}`)
-            input.form__input(name='dateId', type='hidden', value=`${review.date}`)
-            input.form__input(name='userId', type='hidden', value=`${review.user}`)
+            +hiddenInput('tour', review.tour)
+            +hiddenInput('date', review.date)
+            +hiddenInput('user', review.user)
           .form__group
             label.form__label Rate this tour
-            input#rating.form__input(name='rating', type='hidden', required)
-            - if (review.rating) document.getElementById('rating').value = review.rating
+            input#rating.form__input(name='rating', type='hidden', required, value=`${review.rating}`)
             .review__rating
               each i in [0, 1, 2, 3, 4]
                 - const active = 'reviews__star--' + (i < review.rating ? '' : 'in') + 'active';
