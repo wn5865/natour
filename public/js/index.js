@@ -52,16 +52,21 @@ if (reviewForm) {
   const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
   let rating = document.getElementById('rating');
 
+  console.log(stars);
+
   // Implement interactive color change of rating stars on click
   stars.forEach((star) => {
     const id = Number(star.dataset.id);
     star.addEventListener('click', () => {
       rating.value = id + 1;
       stars.forEach((star, i) => {
-        star.class = 'reviews__star';
-        i <= id
-          ? star.classList.add('reviews__star--active')
-          : star.classList.add('reviews__star--inactive');
+        if (i <= id) {
+          star.classList.add('reviews__star--active');
+          star.classList.remove('reviews__star--inactive');
+        } else {
+          star.classList.add('reviews__star--inactive');
+          star.classList.remove('reviews__star--active');
+        }
       });
     });
   });
