@@ -26,17 +26,6 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
   next();
 });
 
-/**
- * Middleware to set tour and user IDs
- * This contruct a request body from URL parameters when using nested
- * routes, e.g. tours/:tourId/bookings or users/:userId/bookings
- */
-exports.setTourAndUser = catchAsync(async (req, res, next) => {
-  req.body.tour ||= req.params.tourId;
-  req.body.user ||= req.params.userId || req.user.id;
-  next();
-});
-
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get tour and tour date
   const { tourId, dateId } = req.params;

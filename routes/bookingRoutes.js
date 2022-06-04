@@ -1,6 +1,7 @@
 const express = require('express');
 const bookingController = require('../controllers/bookingController.js');
 const authController = require('../controllers/authController.js');
+const factory = require('../controllers/handlerFactory');
 
 const router = express.Router({ mergeParams: true });
 
@@ -15,7 +16,7 @@ router.use(authController.restrictTo('admin', 'lead-guide'));
 
 router
   .route('/')
-  .all(bookingController.setTourAndUser)
+  .all(factory.setTourAndUser)
   .get(bookingController.getAllBookings)
   .post(bookingController.createBooking);
 

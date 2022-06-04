@@ -2,11 +2,13 @@ const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 const bookingRouter = require('../routes/bookingRoutes');
+const bookmarkRouter = require('../routes/bookmarkRoutes');
 
 const router = express.Router();
 
 // Nested routes
 router.use('/:userId/bookings', bookingRouter);
+router.use('/:tourId/bookmarks', bookmarkRouter);
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);

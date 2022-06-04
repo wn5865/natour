@@ -74,3 +74,14 @@ exports.getAll = (Model) =>
       data: { data: doc },
     });
   });
+
+/**
+ * Middleware to set tour and user IDs
+ * This contruct a request body from URL parameters when using nested
+ * routes, e.g. tours/:tourId/bookings or users/:userId/bookings
+ */
+exports.setTourAndUser = (req, res, next) => {
+  req.body.tour ||= req.params.tourId;
+  req.body.user ||= req.params.userId || req.user.id;
+  next();
+};
