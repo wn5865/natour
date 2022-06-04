@@ -8,17 +8,16 @@ router.use(authController.protect);
 
 router.get(
   '/create-checkout-session/:tourId/:dateId',
-  bookingController.getCheckoutSession
+  bookingController.createCheckoutSession
 );
 
 router.use(authController.restrictTo('admin', 'lead-guide'));
 
 router
   .route('/')
+  .all(bookingController.setTourAndUser)
   .get(bookingController.getAllBookings)
-  // Post method can get requests from user and tour router e.g.
-  // /user/:userId/bookings or /tour/:tourId/bookings
-  .post(bookingController.setTourUserPrice, bookingController.createBooking);
+  .post(bookingController.createBooking);
 
 router
   .route('/:id')
