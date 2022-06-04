@@ -15,7 +15,7 @@ exports.deleteBooking = factory.deleteOne(Booking);
 
 /**
  * Middleware to check if the current user has actually booked a tour
- * in order to prevent a user from writing reviews without booking.
+ * This prevents a user from writing a review without booking.
  */
 exports.checkIfBooked = catchAsync(async (req, res, next) => {
   const booking = await Booking.findOne(req.body);
@@ -27,45 +27,17 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Middleware to set tour ID, user ID, and price before creating a booking
+ * Middleware to set tour and user IDs
+ * This contruct a request body from URL parameters when using nested
+ * routes, e.g. tours/:tourId/bookings or users/:userId/bookings
  */
-exports.setTourUserPrice = catchAsync(async (req, res, next) => {
-  // Set tour ID
-  if (!req.body.tour) {
-    if (!req.params.tourId)
-      return next(
-        new AppError(
-          'Tour ID must be specified as a parameter or in the body',
-          400
-        )
-      );
-    req.body.tour = req.params.tourId;
-  }
-
-  // Set user ID
-  if (!req.body.user) {
-    if (!req.params.userId)
-      return next(
-        new AppError(
-          'User ID must be specified as a parameter or in the body',
-          400
-        )
-      );
-    req.body.user = req.params.userId;
-  }
-
-  // Set price
-  if (!req.body.price) {
-    const tour = await Tour.findById(req.body.tour);
-    if (!tour) {
-      return next(new AppError('Tour ID is invalid', 400));
-    }
-    req.body.price = tour.price;
-  }
+exports.setTourAndUser = catchAsync(async (req, res, next) => {
+  req.body.tour ||= req.params.tourId;
+  req.body.user ||= req.params.userId || req.user.id;
   next();
 });
 
-exports.getCheckoutSession = catchAsync(async (req, res, next) => {
+exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get tour and tour date
   const { tourId, dateId } = req.params;
   const tour = await Tour.findById(tourId);
@@ -110,7 +82,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
 /**
  * Webhook to be automatically notified from Stripe that a checkout has been
- * completed sucessfully and then create a booking
+ * completed, and then create a booking
  */
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const payload = req.body;
@@ -166,8 +138,7 @@ const fulfillOrder = async (session, user) => {
   }
 
   // If not, increment the number of participants and save the tour info
-  ++date.participants;
-  if (date.participants === tour.maxGroupSize) date.soldOut = true;
+  date.soldOut = ++date.participants === tour.maxGroupSize;
   await tour.save();
 
   const price = session.amount_total / 100;
