@@ -18,12 +18,10 @@ exports.deleteBooking = factory.deleteOne(Booking);
  * in order to prevent a user from writing reviews without booking.
  */
 exports.checkIfBooked = catchAsync(async (req, res, next) => {
-  const booking = await Booking.findOne({
-    user: req.body.user,
-    tour: req.body.tour,
-  });
+  const booking = await Booking.findOne(req.body);
   if (!booking) {
-    return next(new AppError('You must book a tour to write a review', 400));
+    const message = 'You must book a tour to write a review';
+    return next(new AppError(message, 400));
   }
   next();
 });
