@@ -17,6 +17,8 @@ const bookmarkSchema = new mongoose.Schema({
   },
 });
 
+bookmarkSchema.index({ user: 1, tour: 1 }, { unique: true });
+
 const Bookmark = mongoose.model('Bookmark', bookmarkSchema);
 
 module.exports = Bookmark;
