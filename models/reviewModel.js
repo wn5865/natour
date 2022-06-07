@@ -81,6 +81,10 @@ reviewSchema.post('save', function () {
   this.constructor.calcAverageRatings(this.tour);
 });
 
+reviewSchema.post('remove', function () {
+  this.constructor.calcAverageRatings(this.tour);
+});
+
 reviewSchema.post(/^findOneAnd/, async function (result, next) {
   if (!result) return next(new AppError('No document found with the ID'));
   await result.constructor.calcAverageRatings(result.tour);
