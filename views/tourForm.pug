@@ -68,7 +68,7 @@ block content
         .form__group
           - const startLocation = tour ? `${JSON.stringify(tour.startLocation)}` : '';
           label.form__label Start location
-          textarea.form__input.form__textarea(name='startLocation')= startLocation
+          textarea.form__input.form__textarea(name='startLocation', required)= startLocation
         .form__group
           - const locations = tour ? `${JSON.stringify(tour.locations)}` : '';
           label.form__label Locations

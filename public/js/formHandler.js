@@ -7,5 +7,6 @@ export const handleForm = function (event) {
       data[key] = data[key] ? JSON.parse(data[key]) : undefined;
     } catch {}
   });
+  console.log(data);
   return data;
 };

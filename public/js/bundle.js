@@ -537,31 +537,44 @@ var _review = require("./review");
 var _formHandlerJs = require("./formHandler.js");
 var _bookmark = require("./bookmark");
 var _tour = require("./tour");
+var _user = require("./user");
 const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('#login-form > .form');
 const signupForm = document.querySelector('#signup-form > .form');
 const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
-const userDataForm = document.querySelector('.form-user-data');
+const userDataForm = document.querySelector('#user-data > .form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 const bookmarkBtn = document.getElementById('btn-bookmark');
 const tourForm = document.querySelector('#tour-form > .form');
+const userForm = document.querySelector('#user-form > .form');
 if (tourForm) {
-    const submitTourBtn = document.getElementById('submit-btn');
-    const updateTourBtn = document.getElementById('update-btn');
-    const deleteTourBtn = document.getElementById('delete-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const updateBtn = document.getElementById('update-btn');
+    const deleteBtn = document.getElementById('delete-btn');
     // Implement submit, update and delete tour
-    if (submitTourBtn) tourForm.addEventListener('submit', (e)=>_tour.createTour(_formHandlerJs.handleForm(e))
+    if (submitBtn) tourForm.addEventListener('submit', (e)=>_tour.createTour(_formHandlerJs.handleForm(e))
     );
-    if (updateTourBtn) {
+    if (updateBtn) {
         tourForm.addEventListener('submit', (e)=>_tour.updateTour(_formHandlerJs.handleForm(e))
         );
-        deleteTourBtn.addEventListener('click', (e)=>_tour.deleteTour(_formHandlerJs.handleForm(e))
+        deleteBtn.addEventListener('click', (e)=>_tour.deleteTour(_formHandlerJs.handleForm(e))
         );
     }
+}
+if (userForm) {
+    const submitBtn = document.getElementById('submit-btn');
+    const updateBtn = document.getElementById('update-btn');
+    const deactivateBtn = document.getElementById('deactivate-btn');
+    if (submitBtn) userForm.addEventListener('submit', (e)=>_user.createUser(_formHandlerJs.handleForm(e))
+    );
+    if (updateBtn) userForm.addEventListener('submit', (e)=>_user.updateUser(_formHandlerJs.handleForm(e))
+    );
+    if (deactivateBtn) deactivateBtn.addEventListener('click', (e)=>_user.deleteUser(_formHandlerJs.handleForm(e))
+    );
 }
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
@@ -620,7 +633,7 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
 });
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
 
-},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq","./tour":"cyvQL"}],"56xpM":[function(require,module,exports) {
+},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq","./tour":"cyvQL","./user":"cnDPs"}],"56xpM":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -48052,6 +48065,7 @@ const handleForm = function(event) {
             data[key] = data[key] ? JSON.parse(data[key]) : undefined;
         } catch  {}
     });
+    console.log(data);
     return data;
 };
 
@@ -48132,6 +48146,60 @@ const deleteTour = async (data)=>{
         const res = await _axiosDefault.default.delete(`/api/v1/tours/${id}`);
         if (res.status === 204) {
             _alerts.showAlert('success', 'Tour deleted');
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+
+},{"axios":"ddOxJ","./alerts":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}],"cnDPs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "createUser", ()=>createUser
+);
+parcelHelpers.export(exports, "updateUser", ()=>updateUser
+);
+parcelHelpers.export(exports, "deleteUser", ()=>deleteUser
+);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _alerts = require("./alerts");
+const createUser = async (data)=>{
+    try {
+        const res = await _axiosDefault.default.post(`/api/v1/users`, data);
+        if (res.data.status === 'success') {
+            _alerts.showAlert('success', 'User created');
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+const updateUser = async (data)=>{
+    try {
+        const id = data._id;
+        delete data._id;
+        const res = await _axiosDefault.default.patch(`/api/v1/users/${id}`, data);
+        if (res.data.status === 'success') {
+            _alerts.showAlert('success', 'User updated');
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+const deleteUser = async (data)=>{
+    try {
+        const id = data._id;
+        const res = await _axiosDefault.default.patch(`/api/v1/users/${id}`, {
+            active: false
+        });
+        if (res.status === 200) {
+            _alerts.showAlert('success', 'User deactivated');
             setTimeout(()=>history.back()
             , 3000);
         }

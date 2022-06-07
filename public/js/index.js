@@ -9,6 +9,7 @@ import { writeReview, deleteReview } from './review';
 import { handleForm } from './formHandler.js';
 import { bookmark } from './bookmark';
 import { createTour, updateTour, deleteTour } from './tour';
+import { createUser, updateUser, deleteUser } from './user';
 
 const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
@@ -16,25 +17,39 @@ const loginForm = document.querySelector('#login-form > .form');
 const signupForm = document.querySelector('#signup-form > .form');
 const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
-const userDataForm = document.querySelector('.form-user-data');
+const userDataForm = document.querySelector('#user-data > .form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 const bookmarkBtn = document.getElementById('btn-bookmark');
 const tourForm = document.querySelector('#tour-form > .form');
+const userForm = document.querySelector('#user-form > .form');
 
 if (tourForm) {
-  const submitTourBtn = document.getElementById('submit-btn');
-  const updateTourBtn = document.getElementById('update-btn');
-  const deleteTourBtn = document.getElementById('delete-btn');
+  const submitBtn = document.getElementById('submit-btn');
+  const updateBtn = document.getElementById('update-btn');
+  const deleteBtn = document.getElementById('delete-btn');
 
   // Implement submit, update and delete tour
-  if (submitTourBtn)
+  if (submitBtn)
     tourForm.addEventListener('submit', (e) => createTour(handleForm(e)));
-  if (updateTourBtn) {
+  if (updateBtn) {
     tourForm.addEventListener('submit', (e) => updateTour(handleForm(e)));
-    deleteTourBtn.addEventListener('click', (e) => deleteTour(handleForm(e)));
+    deleteBtn.addEventListener('click', (e) => deleteTour(handleForm(e)));
   }
+}
+
+if (userForm) {
+  const submitBtn = document.getElementById('submit-btn');
+  const updateBtn = document.getElementById('update-btn');
+  const deactivateBtn = document.getElementById('deactivate-btn');
+
+  if (submitBtn)
+    userForm.addEventListener('submit', (e) => createUser(handleForm(e)));
+  if (updateBtn)
+    userForm.addEventListener('submit', (e) => updateUser(handleForm(e)));
+  if (deactivateBtn)
+    deactivateBtn.addEventListener('click', (e) => deleteUser(handleForm(e)));
 }
 
 if (mapBox) {

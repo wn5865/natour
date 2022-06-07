@@ -21,12 +21,12 @@ block content
             h5.admin-nav__heading Admin
             ul.side-nav
               +navItem('/manage-tours', 'Manage tours', 'map', false)
-              +navItem('#', 'Manage users', 'users', false)
+              +navItem('/manage-users', 'Manage users', 'users', false)
               +navItem('#', 'Manage reviews', 'star', false)
               +navItem('#', 'Manage bookings', 'briefcase', false)
 
       .user-view__content
-        .user-view__form-container
+        #user-data.user-view__form-container
           h2.heading-secondary.ma-bt-md Your account settings
           form.form.form-user-data(enctype='multipart/form-data')
             .form__group

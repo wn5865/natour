@@ -1,0 +1,46 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      .user-view__content
+        #user-form.user-view__form-container
+          - const name = curUser ? curUser.name : '';
+          - const email = curUser ? curUser.email : '';
+          - const photo = curUser ? curUser.photo : 'default.jpg'
+          - const active = curUser ? curUser.active : false;
+
+          .user-view__heading
+            if curUser
+              img.form__user-photo(src=`/img/users/${photo}`, alt=`User photo`)
+            h2.heading-secondary.ma-bt-md= `${curUser ? curUser.name : 'Create user'}`
+          form.form.form-user-data(enctype='multipart/form-data')
+            if curUser
+              .form__group
+                label.form__label ID
+                input.form__input(type='text', value=`${curUser.id}`, readonly, name='_id')
+            .form__group
+              label.form__label Name
+              input.form__input(type='text', value=`${name}`, required, name='name')
+            .form__group
+              label.form__label Email address
+              input.form__input(type='email', value=`${email}`, required, name='email')
+            if !curUser
+              .form__group
+                label.form__label Password
+                input.form__input(name='password', type='password', placeholder='••••••••', required, minlength='8')
+              .form__group.ma-bt-md
+                label.form__label Confirm password
+                input.form__input(name='passwordConfirm', type='password', placeholder='••••••••', required, minlength='8')
+            .form__group
+              label.form__label Photo
+              input.form__input(type='text', value=`${photo}`, required, name='photo')
+            if curUser && curUser.role !== 'admin'
+              .form__group
+                label.form__label Active
+                input.form__input(type='text', value=`${active}`, required, name='active')
+            .form__group.right
+              if user
+                button#update-btn.btn.btn--small.btn--green.mr-2 Update
+              else
+                button#submit-btn.btn.btn--small.btn--green Submit

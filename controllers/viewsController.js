@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
@@ -151,6 +152,7 @@ exports.getAccount = (req, res) => {
 };
 
 // ADMINISTRATOR PAGES
+// 1) TOURS
 exports.manageTours = catchAsync(async (req, res, next) => {
   // Get all tours
   const tours = await Tour.find();
@@ -158,17 +160,32 @@ exports.manageTours = catchAsync(async (req, res, next) => {
   // Convert a date to user-friendly string, and add it as a field
   addDateString(tours);
 
-  res.status(200).render('manage-tours', {
+  res.status(200).render('manageTours', {
     title: 'Manage Tours',
     tours,
     role: 'admin',
   });
 });
-
 exports.getTourForm = catchAsync(async (req, res, next) => {
   const id = req.params.tourId;
   const tour = id ? await Tour.findById(id) : undefined;
   res.status(200).render('tourForm', {
     tour,
+  });
+});
+
+// 2) USERS
+exports.manageUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find().select('+active');
+  res.status(200).render('manageUsers', {
+    title: 'Manage users',
+    users,
+  });
+});
+exports.getUserForm = catchAsync(async (req, res, next) => {
+  const id = req.params.userId;
+  const user = id ? await User.findById(id).select('+active') : undefined;
+  res.status(200).render('userForm', {
+    curUser: user,
   });
 });

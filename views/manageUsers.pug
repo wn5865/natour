@@ -1,0 +1,22 @@
+extends base
+
+mixin userInfo(user)
+  tr 
+    td 
+      a(href=`user/${user._id}`)= user.name
+    td= user.email
+    td= user.active
+
+block content 
+  main.main
+    .mb-4
+      a.btn.btn--green(href='/user') Create a user
+    .table-container
+      table.table
+        thead 
+          tr 
+            each heading in ['Name', 'Email', 'Active']
+              th.heading-secondary= heading
+        tbody 
+          each user in users
+            +userInfo(user)
