@@ -116,7 +116,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 
   // 4) Render tour details
-  res.status(200).render('tour-detail', {
+  res.status(200).render('tourDetail', {
     title: tour.name,
     tour,
     dates: tour.startDates,
@@ -170,7 +170,7 @@ exports.getTourForm = catchAsync(async (req, res, next) => {
   const id = req.params.tourId;
   const tour = id ? await Tour.findById(id) : {};
 
-  res.status(200).render('tour-form', {
+  res.status(200).render('tourForm', {
     tour,
   });
 });

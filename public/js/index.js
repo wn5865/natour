@@ -11,8 +11,8 @@ import { bookmark } from './bookmark';
 
 const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
-const loginForm = document.querySelector('.login-form > .form');
-const signupForm = document.querySelector('.signup-form > .form');
+const loginForm = document.querySelector('#login-form > .form');
+const signupForm = document.querySelector('#signup-form > .form');
 const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
