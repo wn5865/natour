@@ -1,6 +1,44 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
+const startDatesSchema = new mongoose.Schema({
+  date: {
+    type: Date,
+    required: [true, 'A tour must have a start date'],
+  },
+  participants: {
+    type: Number,
+    default: 0,
+  },
+  soldOut: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const startLocationSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    default: 'Point',
+    enum: ['Point'],
+  },
+  coordinates: [Number],
+  address: String,
+  description: String,
+});
+
+const locationSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    default: 'Point',
+    enum: ['Point'],
+  },
+  coordinates: [Number],
+  address: String,
+  description: String,
+  day: Number,
+});
+
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -49,7 +87,6 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       validate: {
         validator: function (val) {
-          // this only applies to current doc on New document creation
           return val < this.price;
         },
         message: 'Discount ({VALUE}) should be below the regular price',
@@ -75,60 +112,22 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: {
-      type: [
-        {
-          date: {
-            type: Date,
-            required: [true, 'A tour must have a start date'],
-          },
-          participants: {
-            type: Number,
-            default: 0,
-          },
-          soldOut: {
-            type: Boolean,
-            default: false,
-          },
-        },
-      ],
+      type: [startDatesSchema],
       validate: {
-        validator: function (dates) {
-          return dates
-            .map((date) => date.participants <= this.maxGroupSize)
+        validator: function (startDates) {
+          return startDates
+            .map((startDate) => startDate.participants <= this.maxGroupSize)
             .every(Boolean);
         },
-        message:
-          'The number of participants({VALUE}) cannot exceed the maximum group size',
+        message: 'The number of participants cannot exceeds maxGroupSize',
       },
     },
     secretTour: {
       type: Boolean,
       default: false,
     },
-    startLocation: {
-      // GeoJSON
-      type: {
-        type: String,
-        default: 'Point',
-        enum: ['Point'],
-      },
-      coordinates: [Number],
-      address: String,
-      description: String,
-    },
-    locations: [
-      {
-        type: {
-          type: String,
-          default: 'Point',
-          enum: ['Point'],
-        },
-        coordinates: [Number],
-        address: String,
-        description: String,
-        day: Number,
-      },
-    ],
+    startLocation: startLocationSchema,
+    locations: [locationSchema],
     guides: [
       {
         type: mongoose.Schema.ObjectId,
@@ -167,7 +166,6 @@ tourSchema.pre('save', function (next) {
 // Query middleware
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: false });
-  this.start = Date.now();
   next();
 });
 
@@ -179,32 +177,5 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-// Methods
-tourSchema.methods.datesToString = function () {
-  return this.startDates.map((date) => {
-    return {
-      id: date.id,
-      date: new Date(date.date).toLocaleString('en-us', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }),
-    };
-  });
-};
-
-// tourSchema.post(/^find/, function (docs, next) {
-//   console.log(`Query took ${Date.now() - this.start}ms`);
-//   next();
-// });
-
-// Aggregation middleware
-// tourSchema.pre('aggregate', function (next) {
-//   console.log(this.pipeline());
-//   this.pipeline().unshift({ $match: { secretTour: false } });
-//   next();
-// });
-
 const Tour = mongoose.model('Tour', tourSchema);
-
 module.exports = Tour;
