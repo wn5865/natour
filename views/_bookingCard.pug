@@ -1,0 +1,42 @@
+mixin bookingCard(tour)
+  .card
+    if user.role === 'user'
+      .card__overlay 
+        a.btn.btn--white.btn--small(href=`/tour/${tour.slug}`) Details
+        a.btn.btn--white.btn--small(href=`/review/${tour._id}/${tour.startDates._id}`) Review
+    .card__header
+      .card__picture
+        .card__picture-overlay &nbsp;
+        img.card__picture-img(src=`img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+      h3.heading-tertirary
+        span= tour.name 
+
+    .card__details
+      h4.card__sub-heading= `${tour.difficulty} ${tour.duration}-day tour`
+      p.card__text= tour.summary
+      .card__data
+        svg.card__icon
+          use(xlink:href='img/icons.svg#icon-map-pin')
+        span= tour.startLocation.description
+      .card__data
+        svg.card__icon
+          use(xlink:href='img/icons.svg#icon-calendar')
+        span= tour.dateStr
+      .card__data
+        svg.card__icon
+          use(xlink:href='img/icons.svg#icon-flag')
+        span= `${tour.locations.length} stops`
+      .card__data
+        svg.card__icon
+          use(xlink:href='img/icons.svg#icon-user')
+        span= `${tour.maxGroupSize} people`
+
+    .card__footer.card__footer--booking
+      p
+        span.card__footer-value= `$${tour.price}`
+        | 
+        span.card__footer-text per person
+      p.card__ratings
+        span.card__footer-value= tour.ratingsAverage
+        | 
+        span.card__footer-text= `rating (${tour.ratingsQuantity})`

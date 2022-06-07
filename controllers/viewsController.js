@@ -4,6 +4,7 @@ const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Bookmark = require('../models/bookmarkModel');
+const { toDateString, addDateString } = require('../utils/date');
 
 /**
  * Sets an alert message used in template engine
@@ -21,13 +22,58 @@ exports.alerts = (req, res, next) => {
  * Gets all tours and render overview page
  */
 exports.getOverview = catchAsync(async (req, res, next) => {
+  // Get all tours
   const tours = await Tour.find();
-  const dates = tours.map((tour) => tour.datesToString()[0].date);
 
+  // Convert a date to string, and add it as a field
+  addDateString(tours);
+
+  // Render tours
   res.status(200).render('overview', {
     title: 'All tours',
     tours,
-    dates,
+  });
+});
+
+/**
+ * Gets bookmarks and render them
+ */
+exports.getMyBookmarks = catchAsync(async (req, res, next) => {
+  // Get bookmarks first and get tours from them
+  const tours = (
+    await Bookmark.find({ user: req.user._id }).populate('tour')
+  ).map((bookmark) => bookmark.tour);
+
+  // Convert a date to string, and add it as a field
+  addDateString(tours);
+
+  // Render tours
+  res.status(200).render('overview', {
+    title: 'All tours',
+    tours,
+  });
+});
+
+/**
+ * Gets all bookings of current user and render 'My Bookings' page
+ */
+exports.getMyBookings = catchAsync(async (req, res, next) => {
+  // Get all bookings and then dates from bookings
+  const bookings = await Booking.find({ user: req.user.id });
+  const dateIDs = bookings.map((booking) => booking.date);
+
+  // Find tours with the date IDs
+  const tours = await Tour.aggregate([
+    { $unwind: '$startDates' },
+    { $match: { 'startDates._id': { $in: dateIDs } } },
+  ]);
+
+  // Convert a date to string, and add it as a field
+  addDateString(tours);
+
+  res.status(200).render('bookings', {
+    title: 'My Tours',
+    tours,
   });
 });
 
@@ -48,8 +94,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
   }
 
   let bookmark;
+  // 2) If logged in,
   if (req.user) {
-    // 2) If logged in,
     const IDs = { tour: tour._id, user: req.user._id };
 
     // 2-1) remove tour dates that has been already booked or sold out
@@ -63,58 +109,12 @@ exports.getTour = catchAsync(async (req, res, next) => {
     bookmark = await Bookmark.findOne(IDs);
   }
 
-  const dates = tour.datesToString();
+  // 3) Render tour details
   res.status(200).render('tour', {
     title: tour.name,
     tour,
-    dates,
+    dates: tour.startDates.map(toDateString),
     bookmark,
-  });
-});
-
-/**
- * Gets bookmarks and render them
- */
-exports.getMyBookmarks = catchAsync(async (req, res, next) => {
-  const bookmarks = await Bookmark.find({ user: req.user._id }).populate(
-    'tour'
-  );
-  const tours = bookmarks.map((bookmark) => bookmark.tour);
-  const dates = tours.map((tour) => tour.datesToString()[0].date);
-
-  res.status(200).render('overview', {
-    title: 'Bookmarks',
-    tours,
-    dates,
-  });
-});
-
-/**
- * Gets all bookings of current user and render 'My Bookings' page
- */
-exports.getMyTours = catchAsync(async (req, res, next) => {
-  // Get all bookings from a user info
-  const bookings = await Booking.find({ user: req.user.id });
-
-  // Get tours and date IDs
-  const dateIDs = bookings.map((el) => el.date);
-  const tours = await Tour.aggregate([
-    { $unwind: '$startDates' },
-    { $match: { 'startDates._id': { $in: dateIDs } } },
-  ]);
-
-  // Loop through the array to transform a date to string
-  tours.forEach((tour) => {
-    tour.dateStr = new Date(tour.startDates.date).toLocaleString('en-us', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  });
-
-  res.status(200).render('bookings', {
-    title: 'My Tours',
-    tours,
   });
 });
 
@@ -143,3 +143,13 @@ exports.getAccount = (req, res) => {
     title: 'Your account',
   });
 };
+
+// ADMINISTRATOR PAGES
+exports.manageTours = catchAsync(async (req, res, next) => {
+  const tours = await Tour.find();
+
+  res.status(200).render('overview', {
+    title: 'Manage Tours',
+    tours,
+  });
+});

@@ -16,7 +16,14 @@ router.use(authController.protect);
 
 router.get('/me', viewsController.getAccount);
 router.get('/my-bookmarks', viewsController.getMyBookmarks);
-router.get('/my-tours', viewsController.getMyTours);
+router.get('/my-bookings', viewsController.getMyBookings);
 router.get('/review/:tourId/:dateId', viewsController.getReviewForm);
+
+router.use(authController.restrictTo('admin'));
+
+// router.get('manage-tours', viewsController.manageTours);
+// router.get('manage-users', viewsController.manageUsers);
+// router.get('manage-reviews', viewsController.manageReviews);
+// router.get('manage-bookings', viewsController.manageBookings);
 
 module.exports = router;
