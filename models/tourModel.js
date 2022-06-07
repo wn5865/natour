@@ -181,7 +181,7 @@ tourSchema.pre(/^find/, function (next) {
 
 // Methods
 tourSchema.methods.datesToString = function () {
-  const modified = this.startDates.map((date) => {
+  return this.startDates.map((date) => {
     return {
       id: date.id,
       date: new Date(date.date).toLocaleString('en-us', {
@@ -191,8 +191,6 @@ tourSchema.methods.datesToString = function () {
       }),
     };
   });
-  console.log(modified);
-  return modified;
 };
 
 // tourSchema.post(/^find/, function (docs, next) {
