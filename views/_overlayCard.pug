@@ -1,9 +1,12 @@
-mixin bookingCard(tour)
+mixin overlayCard(tour, role)
   .card
-    if user.role === 'user'
-      .card__overlay 
-        a.btn.btn--white.btn--small(href=`/tour/${tour.slug}`) Details
-        a.btn.btn--white.btn--small(href=`/review/${tour._id}/${tour.startDates._id}`) Review
+    .card__overlay 
+      a.btn.btn--white(href=`/tour-detail/${tour.slug}`) Details
+      if role === 'user'
+        a.btn.btn--white(href=`/review/${tour._id}/${tour.startDates._id}`) Review
+      if role === 'admin'
+        a.btn.btn--green(href=`/tour/${tour._id}`) Update
+  
     .card__header
       .card__picture
         .card__picture-overlay &nbsp;

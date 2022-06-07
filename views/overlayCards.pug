@@ -1,9 +1,10 @@
 extends base
 
-include _bookingCard
+include _overlayCard
 
 block content
   main.main 
+    block header
     .card-container
       each tour in tours
-        +bookingCard(tour)
+        +overlayCard(tour, role)
