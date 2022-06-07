@@ -14,6 +14,22 @@ exports.deleteOne = (Model) =>
     });
   });
 
+exports.findByIdAndSave = (Model) =>
+  catchAsync(async (req, res, next) => {
+    // 1) Get a tour by ID
+    const doc = await Tour.findById(req.params.id);
+    if (!doc) return next(new AppError('No document found with the ID', 404));
+
+    // 2) Update tour
+    doc.set(req.body);
+    await doc.save();
+
+    res.status(200).json({
+      status: 'success',
+      data: { data: doc },
+    });
+  });
+
 exports.updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {

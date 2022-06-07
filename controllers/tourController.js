@@ -9,8 +9,8 @@ const factory = require('../controllers/handlerFactory');
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 exports.getAllTours = factory.getAll(Tour);
 exports.createTour = factory.createOne(Tour);
-exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
+exports.updateTour = factory.findByIdAndSave(Tour);
 
 /**
  * Middleware for retrieving top 5 tours when sorted by average

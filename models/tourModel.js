@@ -128,12 +128,7 @@ const tourSchema = new mongoose.Schema(
     },
     startLocation: startLocationSchema,
     locations: [locationSchema],
-    guides: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-      },
-    ],
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
   },
   {
     toJSON: { virtuals: true },
