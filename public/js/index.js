@@ -8,6 +8,7 @@ import { showAlert } from './alerts.js';
 import { writeReview, deleteReview } from './review';
 import { handleForm } from './formHandler.js';
 import { bookmark } from './bookmark';
+import { createTour, updateTour, deleteTour } from './tour';
 
 const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
@@ -20,6 +21,21 @@ const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 const bookmarkBtn = document.getElementById('btn-bookmark');
+const tourForm = document.querySelector('#tour-form > .form');
+
+if (tourForm) {
+  const submitTourBtn = document.getElementById('submit-btn');
+  const updateTourBtn = document.getElementById('update-btn');
+  const deleteTourBtn = document.getElementById('delete-btn');
+
+  // Implement submit, update and delete tour
+  if (submitTourBtn)
+    tourForm.addEventListener('submit', (e) => createTour(handleForm(e)));
+  if (updateTourBtn) {
+    tourForm.addEventListener('submit', (e) => updateTour(handleForm(e)));
+    deleteTourBtn.addEventListener('click', (e) => deleteTour(handleForm(e)));
+  }
+}
 
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);

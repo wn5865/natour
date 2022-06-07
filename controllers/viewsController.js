@@ -166,10 +166,8 @@ exports.manageTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTourForm = catchAsync(async (req, res, next) => {
-  // Get a tour
   const id = req.params.tourId;
-  const tour = id ? await Tour.findById(id) : {};
-
+  const tour = id ? await Tour.findById(id) : undefined;
   res.status(200).render('tourForm', {
     tour,
   });

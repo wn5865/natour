@@ -536,6 +536,7 @@ var _alertsJs = require("./alerts.js");
 var _review = require("./review");
 var _formHandlerJs = require("./formHandler.js");
 var _bookmark = require("./bookmark");
+var _tour = require("./tour");
 const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('#login-form > .form');
@@ -547,6 +548,21 @@ const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
 const bookmarkBtn = document.getElementById('btn-bookmark');
+const tourForm = document.querySelector('#tour-form > .form');
+if (tourForm) {
+    const submitTourBtn = document.getElementById('submit-btn');
+    const updateTourBtn = document.getElementById('update-btn');
+    const deleteTourBtn = document.getElementById('delete-btn');
+    // Implement submit, update and delete tour
+    if (submitTourBtn) tourForm.addEventListener('submit', (e)=>_tour.createTour(_formHandlerJs.handleForm(e))
+    );
+    if (updateTourBtn) {
+        tourForm.addEventListener('submit', (e)=>_tour.updateTour(_formHandlerJs.handleForm(e))
+        );
+        deleteTourBtn.addEventListener('click', (e)=>_tour.deleteTour(_formHandlerJs.handleForm(e))
+        );
+    }
+}
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     _mapboxJs.displayMap(locations);
@@ -604,7 +620,7 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
 });
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
 
-},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq"}],"56xpM":[function(require,module,exports) {
+},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq","./tour":"cyvQL"}],"56xpM":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -15322,7 +15338,6 @@ const login = async (data)=>{
 };
 const signup = async (data)=>{
     try {
-        console.log(data);
         const res = await _axiosDefault.default.post('api/v1/users/signup', data);
         if (res.data.status === 'success') {
             _alertsJs.showAlert('success', 'Signed up successfully');
@@ -48032,6 +48047,11 @@ const handleForm = function(event) {
     event.preventDefault();
     const formData = new FormData(event.target.closest('.form'));
     const data = Object.fromEntries(formData.entries());
+    Object.keys(data).forEach((key)=>{
+        try {
+            data[key] = data[key] ? JSON.parse(data[key]) : undefined;
+        } catch  {}
+    });
     return data;
 };
 
@@ -48066,6 +48086,60 @@ const bookmark = async (btn)=>{
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv","axios":"ddOxJ","./alerts.js":"k2eto"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv","axios":"ddOxJ","./alerts.js":"k2eto"}],"cyvQL":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "createTour", ()=>createTour
+);
+parcelHelpers.export(exports, "updateTour", ()=>updateTour
+);
+parcelHelpers.export(exports, "deleteTour", ()=>deleteTour
+);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _alerts = require("./alerts");
+const createTour = async (data)=>{
+    try {
+        const res = await _axiosDefault.default.post(`/api/v1/tours`, data);
+        if (res.data.status === 'success') {
+            _alerts.showAlert('success', 'Tour created');
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+const updateTour = async (data)=>{
+    try {
+        const id = data._id;
+        delete data._id;
+        const res = await _axiosDefault.default.patch(`/api/v1/tours/${id}`, data);
+        if (res.data.status === 'success') {
+            _alerts.showAlert('success', 'Tour updated');
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+const deleteTour = async (data)=>{
+    let response = confirm('Are you sure you want to delete this tour?');
+    if (!response) return;
+    try {
+        const id = data._id;
+        const res = await _axiosDefault.default.delete(`/api/v1/tours/${id}`);
+        if (res.status === 204) {
+            _alerts.showAlert('success', 'Tour deleted');
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
+
+},{"axios":"ddOxJ","./alerts":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
 
 //# sourceMappingURL=bundle.js.map

@@ -2,68 +2,84 @@ extends base
 
 block content
   main.main 
-    .form-container.form-container--tour
-      h2.heading-secondary.ma-bt-lg= `${Object.keys(tour).length === 0 ? 'create tour' : 'update tour'}`
+    #tour-form.form-container.form-container--tour
+      h2.heading-secondary.ma-bt-lg= `${tour ? 'update tour' : 'create tour'}`
       form.form
+        if tour
+          .form__group
+            label.form__label ID
+            input.form__input(name='_id', type='text', value=`${tour.id}`)
         .form__group
+          - const name = tour ? tour.name : '';
           label.form__label Name
-          input.form__input(name='name', type='text', value=`${tour.name || ''}` required)
+          input.form__input(name='name', type='text', value=`${name}` required)
         .form__group
+          - const duration = tour ? tour.duration : '';
           label.form__label Duration
-          input.form__input(name='duration', type='number', value=`${tour.duration || ''}` required)
+          input.form__input(name='duration', type='number', value=`${duration}` required)
         .form__group
+          - const maxGroupSize = tour ? tour.maxGroupSize : '';
           label.form__label Max group size
-          input.form__input(name='maxGroupSize', type='number', value=`${tour.maxGroupSize || ''}` required)
+          input.form__input(name='maxGroupSize', type='number', value=`${maxGroupSize}` required)
         .form__group
+          - const difficulty = tour ? tour.difficulty : '';
           label.form__label Difficulty
-          input.form__input(name='difficulty', type='text', value=`${tour.difficulty || ''}` required)
+          input.form__input(name='difficulty', type='text', value=`${difficulty}` required)
         .form__group
+          - const ratingsAverage = tour ? tour.ratingsAverage : ''
           label.form__label Ratings average
-          input.form__input(name='ratingsAverage', type='number', value=`${tour.ratingsAverage || ''}`)
+          input.form__input(name='ratingsAverage', type='number', value=`${ratingsAverage}`)
         .form__group
+          - const ratingsQuantity = tour ? tour.ratingsQuantity : ''
           label.form__label Ratings quantity
-          input.form__input(name='ratingsQuantity', type='number', value=`${tour.ratingsQuantity || ''}`)
+          input.form__input(name='ratingsQuantity', type='number', value=`${ratingsQuantity}`)
         .form__group
+          - const price = tour ? tour.price : ''
           label.form__label Price
-          input.form__input(name='price', type='number', value=`${tour.price || ''}` required)
+          input.form__input(name='price', type='number', value=`${price}` required)
         .form__group
+          - const priceDiscount = tour ? tour.priceDiscount : '';
           label.form__label Price discount
-          input.form__input(name='priceDiscount', type='number', value=`${tour.priceDiscount || ''}`)
+          input.form__input(name='priceDiscount', type='number', value=`${priceDiscount}`)
         .form__group
+          - const summary = tour ? tour.summary : '';
           label.form__label Summary
-          textarea.form__input.form__textarea(name='summary', required)= `${tour.summary || ''}`
+          textarea.form__input.form__textarea(name='summary', required)= `${summary}`
         .form__group
+          - const description = tour ? tour.description : '';
           label.form__label Description
-          textarea.form__input.form__textarea(name='description')= `${tour.description || ''}`
+          textarea.form__input.form__textarea(name='description')= `${description}`
         .form__group
+          - const imageCover = tour ? tour.imageCover : '';
           label.form__label imageCover
-          input.form__input(name='imageCover', type='text', value=`${tour.imageCover || ''}` required)
+          input.form__input(name='imageCover', type='text', value=`${imageCover}` required)
         .form__group
-          - const images = tour ? JSON.stringify(tour.images) : ''
+          - const images = tour ? JSON.stringify(tour.images) : '';
           label.form__label Images
-          input.form__input(name='images', type='text', value=`${images}` required)
+          input.form__input(name='images', type='text', value=`${images}`)
         .form__group
           - const startDates = tour ? JSON.stringify(tour.startDates) : '';
           label.form__label Start dates
-          textarea.form__input.form__textarea(name='startDates')= `${startDates}`
+          textarea.form__input.form__textarea(name='startDates', required)= `${startDates}`
         .form__group
           - const secretTour = tour ? String(tour.secretTour) : '';
           label.form__label Secret tour
           input.form__input(name='secretTour', type='text', value=`${secretTour}`)
         .form__group
-          - const startLocation = tour ? `${JSON.stringify(tour.startLocation)}` : ''
+          - const startLocation = tour ? `${JSON.stringify(tour.startLocation)}` : '';
           label.form__label Start location
           textarea.form__input.form__textarea(name='startLocation')= startLocation
         .form__group
-          - const locations = tour ? `${JSON.stringify(tour.locations)}` : ''
+          - const locations = tour ? `${JSON.stringify(tour.locations)}` : '';
           label.form__label Locations
           textarea.form__input.form__textarea(name='locations')= locations
         .form__group
-          - const guides = tour ? `${JSON.stringify(tour.guides)}` : ''
+          - const guides = tour ? `${JSON.stringify(tour.guides)}` : '';
           label.form__label Guides
           textarea.form__input.form__textarea(name='guides')= guides
         .form__group
           if tour
-            button.btn.btn--green Update
+            button#update-btn.btn.btn--green.mr-2(type='submit') Update
+            button#delete-btn.btn.btn--red(type='button') Delete
           else
-            button.btn.btn--green Submit
+            button#submit-btn.btn.btn--green(type='submit') Submit
