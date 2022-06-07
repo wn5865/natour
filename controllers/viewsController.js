@@ -49,7 +49,7 @@ exports.getMyBookmarks = catchAsync(async (req, res, next) => {
 
   // Render tours
   res.status(200).render('overview', {
-    title: 'All tours',
+    title: 'Bookmarks',
     tours,
   });
 });
@@ -71,9 +71,10 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
   // Convert a date to string, and add it as a field
   addDateString(tours);
 
-  res.status(200).render('bookings', {
-    title: 'My Tours',
+  res.status(200).render('overlayCards', {
+    title: 'My tours',
     tours,
+    role: 'user',
   });
 });
 
@@ -109,11 +110,16 @@ exports.getTour = catchAsync(async (req, res, next) => {
     bookmark = await Bookmark.findOne(IDs);
   }
 
-  // 3) Render tour details
-  res.status(200).render('tour', {
+  // 3) Add user-friendly dates
+  tour.startDates.forEach((date) => {
+    date.dateStr = toDateString(date.date);
+  });
+
+  // 4) Render tour details
+  res.status(200).render('tour-detail', {
     title: tour.name,
     tour,
-    dates: tour.startDates.map(toDateString),
+    dates: tour.startDates,
     bookmark,
   });
 });
@@ -146,10 +152,25 @@ exports.getAccount = (req, res) => {
 
 // ADMINISTRATOR PAGES
 exports.manageTours = catchAsync(async (req, res, next) => {
+  // Get all tours
   const tours = await Tour.find();
 
-  res.status(200).render('overview', {
+  // Convert a date to user-friendly string, and add it as a field
+  addDateString(tours);
+
+  res.status(200).render('manage-tours', {
     title: 'Manage Tours',
     tours,
+    role: 'admin',
+  });
+});
+
+exports.getTourForm = catchAsync(async (req, res, next) => {
+  // Get a tour
+  const id = req.params.tourId;
+  const tour = id ? await Tour.findById(id) : {};
+
+  res.status(200).render('tour-form', {
+    tour,
   });
 });
