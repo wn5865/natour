@@ -32,23 +32,6 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Gets bookmarks and render them
- */
-exports.getBookmarks = catchAsync(async (req, res, next) => {
-  const bookmarks = await Bookmark.find({ user: req.user._id }).populate(
-    'tour'
-  );
-  const tours = bookmarks.map((bookmark) => bookmark.tour);
-  const dates = tours.map((tour) => tour.datesToString()[0].date);
-
-  res.status(200).render('overview', {
-    title: 'Bookmarks',
-    tours,
-    dates,
-  });
-});
-
-/**
  * Gets a tour and render tour detail page
  */
 exports.getTour = catchAsync(async (req, res, next) => {
@@ -86,6 +69,23 @@ exports.getTour = catchAsync(async (req, res, next) => {
     tour,
     dates,
     bookmark,
+  });
+});
+
+/**
+ * Gets bookmarks and render them
+ */
+exports.getMyBookmarks = catchAsync(async (req, res, next) => {
+  const bookmarks = await Bookmark.find({ user: req.user._id }).populate(
+    'tour'
+  );
+  const tours = bookmarks.map((bookmark) => bookmark.tour);
+  const dates = tours.map((tour) => tour.datesToString()[0].date);
+
+  res.status(200).render('overview', {
+    title: 'Bookmarks',
+    tours,
+    dates,
   });
 });
 
