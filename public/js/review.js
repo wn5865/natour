@@ -21,3 +21,16 @@ export const writeReview = async (data) => {
     showAlert('error', err.response.data.message);
   }
 };
+
+export const deleteReview = async (data) => {
+  try {
+    let res = await axios.delete(`/api/v1/reviews/${data.reviewId}`);
+    if (res.status === 204) {
+      const message = 'Your review has been deleted';
+      showAlert('success', message);
+      setTimeout(() => history.back(), 3000);
+    }
+  } catch (err) {
+    showAlert('error', err.response.data.message);
+  }
+};

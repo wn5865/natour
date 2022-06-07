@@ -25,6 +25,10 @@ block content
                   use(xlink:href='/img/icons.svg#icon-star')
           .form__group
             textarea.form__input.form__textarea(name='review', placeholder="Share your experience with this tour!", required)= review.review
-          .form__group
-            - const btnText = review._id ? 'Update' : 'Submit';
-            button.btn.btn--green= btnText
+          if review._id
+            .form__group
+              button.btn.btn--green(type='submit', style='margin-right: 1rem')= 'Update'
+              button.btn.btn--red.btn--delete(type='button')= 'Delete'
+          else 
+            .form__group
+              button.btn.btn--green(type='submit')= 'Submit'

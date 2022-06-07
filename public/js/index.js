@@ -5,10 +5,11 @@ import { displayMap } from './mapbox.js';
 import { updateSettings } from './updateSettings.js';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts.js';
-import { writeReview } from './review';
+import { writeReview, deleteReview } from './review';
 import { handleForm } from './formHandler.js';
 import { bookmark } from './bookmark';
 
+const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
@@ -58,8 +59,6 @@ if (reviewForm) {
   const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
   let rating = document.getElementById('rating');
 
-  console.log(stars);
-
   // Implement interactive color change of rating stars on click
   stars.forEach((star) => {
     const id = Number(star.dataset.id);
@@ -79,6 +78,12 @@ if (reviewForm) {
 
   // Implement review submit
   reviewForm.addEventListener('submit', (e) => writeReview(handleForm(e)));
+
+  // Implement review delete
+  const deleteBtn = reviewForm.querySelector('.btn--delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', (e) => deleteReview(handleForm(e)));
+  }
 }
 
 if (bookBtn && dateOption) {
@@ -96,5 +101,4 @@ if (bookBtn && dateOption) {
   });
 }
 
-const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) showAlert('success', alertMessage, 20);

@@ -536,6 +536,7 @@ var _alertsJs = require("./alerts.js");
 var _review = require("./review");
 var _formHandlerJs = require("./formHandler.js");
 var _bookmark = require("./bookmark");
+const alertMessage = document.querySelector('body').dataset.alert;
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
@@ -566,7 +567,6 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', async (e)=>{
 if (reviewForm) {
     const stars = reviewForm.querySelectorAll('[class^="reviews__star"');
     let rating = document.getElementById('rating');
-    console.log(stars);
     // Implement interactive color change of rating stars on click
     stars.forEach((star1)=>{
         const id = Number(star1.dataset.id);
@@ -586,6 +586,10 @@ if (reviewForm) {
     // Implement review submit
     reviewForm.addEventListener('submit', (e)=>_review.writeReview(_formHandlerJs.handleForm(e))
     );
+    // Implement review delete
+    const deleteBtn = reviewForm.querySelector('.btn--delete');
+    if (deleteBtn) deleteBtn.addEventListener('click', (e)=>_review.deleteReview(_formHandlerJs.handleForm(e))
+    );
 }
 if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
     const btnText = this.textContent;
@@ -598,7 +602,6 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
     }
     _stripe.bookTour(tourId, dateId);
 });
-const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
 
 },{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq"}],"56xpM":[function(require,module,exports) {
@@ -15319,6 +15322,7 @@ const login = async (data)=>{
 };
 const signup = async (data)=>{
     try {
+        console.log(data);
         const res = await _axiosDefault.default.post('api/v1/users/signup', data);
         if (res.data.status === 'success') {
             _alertsJs.showAlert('success', 'Signed up successfully');
@@ -47985,6 +47989,8 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "writeReview", ()=>writeReview
 );
+parcelHelpers.export(exports, "deleteReview", ()=>deleteReview
+);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
@@ -48003,6 +48009,19 @@ const writeReview = async (data)=>{
         _alerts.showAlert('error', err.response.data.message);
     }
 };
+const deleteReview = async (data)=>{
+    try {
+        let res = await _axiosDefault.default.delete(`/api/v1/reviews/${data.reviewId}`);
+        if (res.status === 204) {
+            const message = 'Your review has been deleted';
+            _alerts.showAlert('success', message);
+            setTimeout(()=>history.back()
+            , 3000);
+        }
+    } catch (err) {
+        _alerts.showAlert('error', err.response.data.message);
+    }
+};
 
 },{"axios":"ddOxJ","./alerts":"k2eto","@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}],"loIAp":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -48011,7 +48030,7 @@ parcelHelpers.export(exports, "handleForm", ()=>handleForm
 );
 const handleForm = function(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.target.closest('.form'));
     const data = Object.fromEntries(formData.entries());
     return data;
 };

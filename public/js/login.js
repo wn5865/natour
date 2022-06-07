@@ -18,6 +18,7 @@ export const login = async (data) => {
 
 export const signup = async (data) => {
   try {
+    console.log(data);
     const res = await axios.post('api/v1/users/signup', data);
 
     if (res.data.status === 'success') {
