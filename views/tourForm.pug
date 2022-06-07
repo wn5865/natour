@@ -2,7 +2,7 @@ extends base
 
 block content
   main.main 
-    .login-signup-form.login-form
+    .tour-form
       h2.heading-secondary.ma-bt-lg= `${Object.keys(tour).length === 0 ? 'create tour' : 'update tour'}`
       form.form
         .form__group
@@ -58,10 +58,10 @@ block content
           - const locations = tour ? `${JSON.stringify(tour.locations)}` : ''
           label.form__label Locations
           textarea.form__input.form__textarea(name='locations')= locations
-        //- .form__group
-        //-   - const locations = tour ? `${JSON.stringify(tour.locations)}` : ''
-        //-   label.form__label Locations
-        //-   textarea.form__input.form__textarea(name='locations')= locations
+        .form__group
+          - const guides = tour ? `${JSON.stringify(tour.guides)}` : ''
+          label.form__label Guides
+          textarea.form__input.form__textarea(name='guides')= guides
         .form__group
           if tour
             button.btn.btn--green Update
