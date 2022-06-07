@@ -535,6 +535,7 @@ var _stripe = require("./stripe");
 var _alertsJs = require("./alerts.js");
 var _review = require("./review");
 var _formHandlerJs = require("./formHandler.js");
+var _bookmark = require("./bookmark");
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
 const signupForm = document.querySelector('.signup-form > .form');
@@ -544,10 +545,13 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
+const bookmarkBtn = document.getElementById('btn-bookmark');
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     _mapboxJs.displayMap(locations);
 }
+if (bookmarkBtn) bookmarkBtn.addEventListener('click', ()=>_bookmark.bookmark(bookmarkBtn)
+);
 if (loginForm) loginForm.addEventListener('submit', (e)=>_loginJs.login(_formHandlerJs.handleForm(e))
 );
 if (signupForm) signupForm.addEventListener('submit', (e)=>_loginJs.signup(_formHandlerJs.handleForm(e))
@@ -597,7 +601,7 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
 
-},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp"}],"56xpM":[function(require,module,exports) {
+},{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq"}],"56xpM":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -18693,19 +18697,27 @@ var utils = require('./../utils');
 },{"./../utils":"1FHfu"}],"k2eto":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "hideAlert", ()=>hideAlert
+parcelHelpers.export(exports, "timeoutId", ()=>timeoutId
 );
 parcelHelpers.export(exports, "showAlert", ()=>showAlert
 );
-const hideAlert = ()=>{
-    const el = document.querySelector('.alert');
-    if (el) el.parentElement.removeChild(el);
-};
+parcelHelpers.export(exports, "hideAlert", ()=>hideAlert
+);
+let timeoutId;
 const showAlert = (type, msg, time = 7)=>{
     hideAlert();
     const markup = `<div class="alert alert--${type}">${msg}</div>`;
     document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-    setTimeout(hideAlert, time * 1000);
+    if (timeoutId) clear();
+    timeoutId = setTimeout(hideAlert, time * 1000);
+};
+const hideAlert = ()=>{
+    const el = document.querySelector('.alert');
+    if (el) el.parentElement.removeChild(el);
+};
+const clear = ()=>{
+    clearTimeout(timeoutId);
+    timeoutId = undefined;
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}],"aFTHv":[function(require,module,exports) {
@@ -48004,6 +48016,37 @@ const handleForm = function(event) {
     return data;
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv"}],"l8AZq":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "bookmark", ()=>bookmark
+);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _alertsJs = require("./alerts.js");
+const bookmark = async (btn)=>{
+    try {
+        let res = btn.dataset.bookmark ? await _axiosDefault.default.delete(`/api/v1/bookmarks/${btn.dataset.bookmark}`) : await _axiosDefault.default.post(`/api/v1/bookmarks`, {
+            tour: btn.dataset.tour
+        });
+        const icon = btn.querySelector('use');
+        const text = btn.querySelector('span');
+        if (res.status === 201) {
+            text.textContent = 'bookmarked';
+            icon.setAttribute('href', '/img/icons.svg#icon-bookmark-filled');
+            btn.setAttribute('data-bookmark', res.data.data.data._id);
+            _alertsJs.showAlert('success', 'Bookmarked successfully');
+        } else if (res.status === 204) {
+            text.textContent = 'bookmark';
+            icon.setAttribute('href', '/img/icons.svg#icon-bookmark');
+            btn.removeAttribute('data-bookmark');
+            _alertsJs.showAlert('success', 'Bookmark removed');
+        }
+    } catch (err) {
+        _alertsJs.showAlert('error', err.response.data.message);
+    }
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"aFTHv","axios":"ddOxJ","./alerts.js":"k2eto"}]},["3d2QF","39bdu"], "39bdu", "parcelRequire11c7")
 
 //# sourceMappingURL=bundle.js.map

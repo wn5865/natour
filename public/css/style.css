@@ -231,7 +231,7 @@ body {
 }
 .btn.btn--white:focus {
   outline: none;
-  background-color: #bbb;
+  background-color: #eee;
 }
 
 .btn--green {
@@ -300,6 +300,18 @@ body {
   outline: none;
   outline: 3px solid #55c57a;
   outline-offset: 3px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.btn-icon svg {
+  margin-right: 0.5rem;
+  height: 2rem;
+  width: 2rem;
+  fill: currentColor;
 }
 
 .header {

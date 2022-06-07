@@ -83,5 +83,6 @@ exports.getAll = (Model) =>
 exports.setTourAndUser = (req, res, next) => {
   req.body.tour ||= req.params.tourId;
   req.body.user ||= req.params.userId || req.user.id;
+  console.log(req.body);
   next();
 };

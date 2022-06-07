@@ -7,6 +7,7 @@ import { bookTour } from './stripe';
 import { showAlert } from './alerts.js';
 import { writeReview } from './review';
 import { handleForm } from './formHandler.js';
+import { bookmark } from './bookmark';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form > .form');
@@ -17,10 +18,15 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
+const bookmarkBtn = document.getElementById('btn-bookmark');
 
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
   displayMap(locations);
+}
+
+if (bookmarkBtn) {
+  bookmarkBtn.addEventListener('click', () => bookmark(bookmarkBtn));
 }
 
 if (loginForm) {

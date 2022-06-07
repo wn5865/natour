@@ -15,6 +15,7 @@ router.get('/signup', viewsController.getSignupForm);
 router.use(authController.protect);
 
 router.get('/me', viewsController.getAccount);
+router.get('/bookmarks', viewsController.getBookmarks);
 router.get('/my-tours', viewsController.getMyTours);
 router.get('/review/:tourId/:dateId', viewsController.getReviewForm);
 

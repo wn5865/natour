@@ -30,6 +30,17 @@ block content
           svg.heading-box__icon
             use(xlink:href='/img/icons.svg#icon-map-pin')
           span.heading-box__text= tour.startLocation.description
+      if user
+        .heading-box__group
+          button#btn-bookmark.btn.btn-icon.btn--white.btn--small(data-tour=`${tour.id}`, data-bookmark=`${bookmark ? bookmark.id : ''}`)
+            if bookmark
+              svg
+                use(href='/img/icons.svg#icon-bookmark-filled')
+              span.heading-box__text bookmarked
+            else 
+              svg
+                use(href='/img/icons.svg#icon-bookmark')
+              span.heading-box__text bookmark
 
   section.section-description
     .overview-box
