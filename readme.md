@@ -23,13 +23,16 @@
  <a href="#acknowledgement">Acknowledgement</a>
 </p>
 
+## Acknowledgement
+
+- This project is part of the online course I've taken at Udemy. Thanks to Jonas
+  Schmedtmann for creating this awesome course! Link to the course: [Node.js,
+  Express, MongoDB & More: The Complete Bootcamp
+  2019](https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/)
+
 ## Deployed Version
 
 Live demo (Feel free to visit) 👉 : https://natours-jiwon.herokuapp.com/
-
-## Acknowledgement
-
-- This project is part of the online course I've taken at Udemy. Thanks to Jonas Schmedtmann for creating this awesome course! Link to the course: [Node.js, Express, MongoDB & More: The Complete Bootcamp 2019](https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/)
 
 ## Key Features
 

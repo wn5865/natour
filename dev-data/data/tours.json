@@ -17,7 +17,7 @@
     "_id": "5c88fa8cf4afda39709c2955",
     "name": "The Sea Explorer",
     "duration": 7,
-    "maxGroupSize": 1,
+    "maxGroupSize": 25,
     "difficulty": "medium",
     "guides": ["5c8a22c62f8fb814b56fa18b", "5c8a1f4e2f8fb814b56fa185"],
     "price": 497,
