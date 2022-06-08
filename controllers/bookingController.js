@@ -29,14 +29,21 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get tour
   const { tourId, dateId } = req.params;
-  const tour = await Tour.findById(tourId);
+  const maxGroupSize = (await Tour.findById(tourId)).maxGroupSize;
+  const tour = await Tour.findOne({
+    _id: tourId,
+    startDates: {
+      $elemMatch: { _id: dateId, participants: { $lte: maxGroupSize } },
+    },
+  });
   const date = tour.startDates.find((el) => el.id === dateId);
 
-  if (date.soldOut) {
+  // 2) Check if the tour date is available
+  if (date.participants >= maxGroupSize) {
     throw new AppError('The date you chose is not available.', 400);
   }
 
-  // 2) Create checkout session
+  // 3) Create checkout session
   const domain = `${req.protocol}://${req.header('host')}`;
   const dateStr = new Date(date.date).toLocaleDateString('en-US', {
     day: 'numeric',
@@ -62,7 +69,7 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
     ],
   });
 
-  // 3) Create session as response
+  // 4) Response
   res.status(200).json({
     status: 'success',
     session,
@@ -71,7 +78,7 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
 
 /**
  * Webhook to be automatically notified from Stripe that a checkout has been
- * completed, and then create a booking
+ * completed, and creates a booking
  */
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const payload = req.body;
