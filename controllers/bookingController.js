@@ -114,27 +114,28 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 });
 
 const fulfillOrder = async (session, user) => {
+  // 1) Get tour and date ID
   const [tourId, dateId] = session.client_reference_id.split('/');
-  const tour = await Tour.findById(tourId);
-  const maxSize = tour.maxSize;
 
+  // 2) Get maxGroupSize
+  const maxGroupSize = (await Tour.findById(tourId)).maxGroupSize;
+
+  // 3) Perform atomic update to avoid concurrency
   const updated = await Tour.findOneAndUpdate(
     {
-      tour: tourId,
+      _id: tourId,
       startDates: {
-        $elemMatch: { _id: dateId, participants: { $ne: maxSize } },
+        $elemMatch: { _id: dateId, participants: { $ne: maxGroupSize } },
       },
     },
-    [{ $inc: { 'startDates.$.participants': 1 } }],
-    { new: true }
+    { $inc: { 'startDates.$.participants': 1 } }
   );
-  console.log(updated);
 
   if (!updated) {
-    // sold out, throw an error
     throw new AppError('The date you chose is not available.', 400);
   }
 
+  // 4) Create a booking
   const price = session.amount_total / 100;
   await Booking.create({ tour: tourId, date: dateId, user: user.id, price });
 };
