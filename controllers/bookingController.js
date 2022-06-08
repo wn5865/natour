@@ -118,7 +118,7 @@ const fulfillOrder = async (session, user) => {
   const filter = {
     tour: tourId,
     startDates: {
-      $elemMatch: { _id: dateId, soldOut: { $ne: '$maxGroupSize' } },
+      $elemMatch: { _id: dateId, participants: { $ne: '$maxGroupSize' } },
     },
   };
   const update = [{ $inc: { 'startDates.$.participants': 1 } }];
@@ -126,13 +126,9 @@ const fulfillOrder = async (session, user) => {
   console.log(tour);
 
   if (!tour) {
-    // If sold out, throw an error
+    // sold out, throw an error
     throw new AppError('The date you chose is not available.', 400);
   }
-
-  // // If not, increment the number of participants and save the tour info
-  // date.soldOut = ++date.participants === tour.maxGroupSize;
-  // await tour.save();
 
   const price = session.amount_total / 100;
   await Booking.create({ tour: tourId, date: dateId, user: user.id, price });
