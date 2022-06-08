@@ -7,11 +7,19 @@ exports.toDateString = (date) => {
   });
 };
 
-// Adds date string as a field of a tour
-exports.addDateString = (tours) => {
+// Adds next available date as a string to tour
+exports.addDateString = (tours, type = 'overview') => {
   tours.forEach((tour) => {
-    const startDates = tour.startDates;
-    const targetDate = Array.isArray(startDates) ? startDates[0] : startDates;
-    tour.dateStr = exports.toDateString(targetDate.date);
+    if (type === 'booking') {
+      tour.dateStr = exports.toDateString(tour.startDates.date);
+    } else {
+      tour.dateStr = '-';
+      for (let date of tour.startDates) {
+        if (date.participants < tour.maxGroupSize) {
+          tour.dateStr = exports.toDateString(date.date);
+          break;
+        }
+      }
+    }
   });
 };

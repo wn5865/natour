@@ -29,7 +29,7 @@ router.get('/manage-users', viewsController.manageUsers);
 router.get('/user', viewsController.getUserForm);
 router.get('/user/:userId', viewsController.getUserForm);
 
-// router.get('/manage-users', viewsController.manageUsers);
+// TO-DOs
 // router.get('/manage-reviews', viewsController.manageReviews);
 // router.get('/manage-bookings', viewsController.manageBookings);
 

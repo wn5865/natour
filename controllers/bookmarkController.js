@@ -1,6 +1,5 @@
 const Bookmark = require('../models/bookmarkModel');
 const factory = require('../controllers/handlerFactory');
-const catchAsync = require('../utils/catchAsync');
 
 exports.getBookmark = factory.getOne(Bookmark, ['tour', 'user']);
 exports.getAllBookmarks = factory.getAll(Bookmark);

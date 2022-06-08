@@ -616,7 +616,7 @@ body {
   margin-top: calc(0px - var(--section-rotate));
   padding: calc(3rem + var(--section-rotate)) 0;
   position: relative;
-  z-index: 1000;
+  z-index: 10;
   background: -webkit-gradient(
     linear,
     left top,
@@ -646,9 +646,12 @@ body {
   grid-column-gap: 6rem;
   grid-auto-flow: column;
   overflow-x: scroll;
+  scrollbar-color: #000;
+  scrollbar-width: 10rem;
   -ms-scroll-snap-type: x mandatory;
   scroll-snap-type: x mandatory;
 }
+
 .reviews__card {
   width: 30rem;
   padding: 4rem;

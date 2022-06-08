@@ -41,9 +41,10 @@ exports.getOverview = catchAsync(async (req, res, next) => {
  */
 exports.getMyBookmarks = catchAsync(async (req, res, next) => {
   // Get bookmarks first and get tours from them
-  const tours = (
-    await Bookmark.find({ user: req.user._id }).populate('tour')
-  ).map((bookmark) => bookmark.tour);
+  const user = req.user._id;
+  const tours = (await Bookmark.find({ user }).populate('tour')).map(
+    (bookmark) => bookmark.tour
+  );
 
   // Convert a date to string, and add it as a field
   addDateString(tours);
@@ -70,7 +71,7 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
   ]);
 
   // Convert a date to string, and add it as a field
-  addDateString(tours);
+  addDateString(tours, 'booking');
 
   res.status(200).render('overlayCards', {
     title: 'My tours',
@@ -100,7 +101,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   if (req.user) {
     const IDs = { tour: tour._id, user: req.user._id };
 
-    // 2-1) remove tour dates that has been already booked or sold out
+    // 2-1) remove tour dates that was already booked by user or sold out
     const bookings = await Booking.find(IDs);
     const dateIDs = bookings.map((booking) => booking.date.toString());
     tour.startDates = tour.startDates
@@ -111,7 +112,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
     bookmark = await Bookmark.findOne(IDs);
   }
 
-  // 3) Add user-friendly dates
+  // 3) Add user-friendly date strings
   tour.startDates.forEach((date) => {
     date.dateStr = toDateString(date.date);
   });
@@ -170,6 +171,7 @@ exports.getTourForm = catchAsync(async (req, res, next) => {
   const id = req.params.tourId;
   const tour = id ? await Tour.findById(id) : undefined;
   res.status(200).render('tourForm', {
+    title: 'Create tour',
     tour,
   });
 });

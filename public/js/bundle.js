@@ -538,55 +538,40 @@ var _formHandlerJs = require("./formHandler.js");
 var _bookmark = require("./bookmark");
 var _tour = require("./tour");
 var _user = require("./user");
+// related to alert message popping up on the top
 const alertMessage = document.querySelector('body').dataset.alert;
+// mapbox on tour detail pages
 const mapBox = document.getElementById('map');
+// login / signup / logout
 const loginForm = document.querySelector('#login-form > .form');
 const signupForm = document.querySelector('#signup-form > .form');
-const reviewForm = document.querySelector('.review__content > .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
-const userDataForm = document.querySelector('#user-data > .form-user-data');
-const userPasswordForm = document.querySelector('.form-user-password');
+// bookmarking tours
+const bookmarkBtn = document.getElementById('btn-bookmark');
+// booking tours
 const bookBtn = document.getElementById('book-tour');
 const dateOption = document.getElementById('date');
-const bookmarkBtn = document.getElementById('btn-bookmark');
+// various forms submitted to back-end
+const userDataForm = document.querySelector('#user-data > .form-user-data');
+const userPasswordForm = document.querySelector('.form-user-password');
+const reviewForm = document.querySelector('.review__content > .form');
 const tourForm = document.querySelector('#tour-form > .form');
 const userForm = document.querySelector('#user-form > .form');
-if (tourForm) {
-    const submitBtn = document.getElementById('submit-btn');
-    const updateBtn = document.getElementById('update-btn');
-    const deleteBtn = document.getElementById('delete-btn');
-    // Implement submit, update and delete tour
-    if (submitBtn) tourForm.addEventListener('submit', (e)=>_tour.createTour(_formHandlerJs.handleForm(e))
-    );
-    if (updateBtn) {
-        tourForm.addEventListener('submit', (e)=>_tour.updateTour(_formHandlerJs.handleForm(e))
-        );
-        deleteBtn.addEventListener('click', (e)=>_tour.deleteTour(_formHandlerJs.handleForm(e))
-        );
-    }
-}
-if (userForm) {
-    const submitBtn = document.getElementById('submit-btn');
-    const updateBtn = document.getElementById('update-btn');
-    const deactivateBtn = document.getElementById('deactivate-btn');
-    if (submitBtn) userForm.addEventListener('submit', (e)=>_user.createUser(_formHandlerJs.handleForm(e))
-    );
-    if (updateBtn) userForm.addEventListener('submit', (e)=>_user.updateUser(_formHandlerJs.handleForm(e))
-    );
-    if (deactivateBtn) deactivateBtn.addEventListener('click', (e)=>_user.deleteUser(_formHandlerJs.handleForm(e))
-    );
+if (alertMessage) {
+    _alertsJs.showAlert('success', alertMessage, 20);
+    window.history.replaceState({}, '', location.href.split('?')[0]);
 }
 if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     _mapboxJs.displayMap(locations);
 }
-if (bookmarkBtn) bookmarkBtn.addEventListener('click', ()=>_bookmark.bookmark(bookmarkBtn)
-);
 if (loginForm) loginForm.addEventListener('submit', (e)=>_loginJs.login(_formHandlerJs.handleForm(e))
 );
 if (signupForm) signupForm.addEventListener('submit', (e)=>_loginJs.signup(_formHandlerJs.handleForm(e))
 );
 if (logOutBtn) logOutBtn.addEventListener('click', _loginJs.logout);
+if (bookmarkBtn) bookmarkBtn.addEventListener('click', ()=>_bookmark.bookmark(bookmarkBtn)
+);
 if (userDataForm) userDataForm.addEventListener('submit', (e)=>_updateSettingsJs.updateSettings(_formHandlerJs.handleForm(e), 'data')
 );
 if (userPasswordForm) userPasswordForm.addEventListener('submit', async (e)=>{
@@ -631,7 +616,31 @@ if (bookBtn && dateOption) bookBtn.addEventListener('click', function(e) {
     }
     _stripe.bookTour(tourId, dateId);
 });
-if (alertMessage) _alertsJs.showAlert('success', alertMessage, 20);
+if (tourForm) {
+    const submitBtn = document.getElementById('submit-btn');
+    const updateBtn = document.getElementById('update-btn');
+    const deleteBtn = document.getElementById('delete-btn');
+    // Implement submit, update and delete tour
+    if (submitBtn) tourForm.addEventListener('submit', (e)=>_tour.createTour(_formHandlerJs.handleForm(e))
+    );
+    if (updateBtn) {
+        tourForm.addEventListener('submit', (e)=>_tour.updateTour(_formHandlerJs.handleForm(e))
+        );
+        deleteBtn.addEventListener('click', (e)=>_tour.deleteTour(_formHandlerJs.handleForm(e))
+        );
+    }
+}
+if (userForm) {
+    const submitBtn = document.getElementById('submit-btn');
+    const updateBtn = document.getElementById('update-btn');
+    const deactivateBtn = document.getElementById('deactivate-btn');
+    if (submitBtn) userForm.addEventListener('submit', (e)=>_user.createUser(_formHandlerJs.handleForm(e))
+    );
+    if (updateBtn) userForm.addEventListener('submit', (e)=>_user.updateUser(_formHandlerJs.handleForm(e))
+    );
+    if (deactivateBtn) deactivateBtn.addEventListener('click', (e)=>_user.deleteUser(_formHandlerJs.handleForm(e))
+    );
+}
 
 },{"core-js/stable":"56xpM","regenerator-runtime/runtime":"4I6xp","./login.js":"99buY","./mapbox.js":"3o1XE","./updateSettings.js":"8C5Ir","./stripe":"tA0bO","./alerts.js":"k2eto","./review":"jLAJH","./formHandler.js":"loIAp","./bookmark":"l8AZq","./tour":"cyvQL","./user":"cnDPs"}],"56xpM":[function(require,module,exports) {
 require('../modules/es.symbol');
@@ -18808,7 +18817,8 @@ const displayMap = (locations)=>{
         }).setLngLat(loc.coordinates).addTo(map);
         // Add popup
         new _mapboxGlDefault.default.Popup({
-            offset: 30
+            offset: 30,
+            focusAfterOpen: false
         }).setLngLat(loc.coordinates).setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`).addTo(map);
         // Extend map bounds to include current location
         bounds.extend(loc.coordinates);

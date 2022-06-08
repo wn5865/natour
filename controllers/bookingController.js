@@ -26,6 +26,10 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Middleware that creates a checkout session used for Stripe online payments.
+ * Sends back the session as a resposnse.
+ */
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get tour
   const { tourId, dateId } = req.params;
@@ -50,7 +54,6 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
     month: 'long',
     year: 'numeric',
   });
-
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     success_url: `${domain}/my-bookings?alert=booking`,
@@ -104,17 +107,18 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
     // fulfill the order
     await fulfillOrder(session, user);
   } catch (err) {
-    // if an error occurred, then refund the payment
+    // if fails to fulfill the order, refund the payment
     await stripe.refunds.create({ payment_intent: session.payment_intent });
 
     // and notify the user by email that his booking failed
     email.sendBookingFail();
 
-    // respond with error message
+    // respond to Stripe server with error message
     return res.status(400).send(`Booking failed: ${err.message}`);
   }
 
-  // send an email that the tour has been successfully booked
+  // Everything went well
+  // Send an email that the tour has been successfully booked
   email.sendBookingSuccess();
 
   res.status(200).json({ received: true });

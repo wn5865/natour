@@ -47,7 +47,10 @@ block content
       div
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
-          +overviewBox('Next date', dates[0].dateStr, 'calendar')
+          if dates.length === 0
+            +overviewBox('Next date', '-', 'calendar')
+          else
+            +overviewBox('Next date', dates[0].dateStr, 'calendar')
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
           +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
           +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
@@ -81,21 +84,22 @@ block content
     .reviews
       each review in tour.reviews
         +reviewCard(review)
-  
-  section.section-cta
-    .cta
-      .cta__img.cta__img--logo
-        img(src='/img/logo-white.png', alt='Natours logo')
-      img.cta__img.cta__img--1(src=`/img/tours/${tour.images[0]}`, alt=``)
-      img.cta__img.cta__img--2(src=`/img/tours/${tour.images[1]}`, alt=``)
-      .cta__content
-        h2.heading-secondary What are you waiting for?
-        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
-        if user
-          select.btn.cta__select(id='date', data-tour-id=`${tour.id}`)
-            option(value='') Select start date!
-            each date in dates
-              option(value=`${date.id}`)= date.dateStr
-          button.btn.btn--green#book-tour Book tour now!
-        else
-          a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
+
+  if dates.length !== 0
+    section.section-cta
+      .cta
+        .cta__img.cta__img--logo
+          img(src='/img/logo-white.png', alt='Natours logo')
+        img.cta__img.cta__img--1(src=`/img/tours/${tour.images[0]}`, alt=``)
+        img.cta__img.cta__img--2(src=`/img/tours/${tour.images[1]}`, alt=``)
+        .cta__content
+          h2.heading-secondary What are you waiting for?
+          p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+          if user
+            select.btn.cta__select(id='date', data-tour-id=`${tour.id}`)
+              option(value='') Select start date!
+              each date in dates
+                option(value=`${date.id}`)= date.dateStr
+            button.btn.btn--green#book-tour Book tour now!
+          else
+            a.btn.btn--green.span-all-rows(href='/login') Log in to book tour

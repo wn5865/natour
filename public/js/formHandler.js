@@ -1,3 +1,7 @@
+/**
+ * Accepts 'submit' event and transform HTML form element to proper object
+ * to be used in the next function
+ */
 export const handleForm = function (event) {
   event.preventDefault();
 
