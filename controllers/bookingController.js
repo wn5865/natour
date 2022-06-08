@@ -27,13 +27,17 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
 });
 
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
-  // 1) Get tour and tour date
+  // 1) Get tour
   const { tourId, dateId } = req.params;
-  const tour = await Tour.findById(tourId);
-  const date = tour.startDates.find((date) => date.id === dateId);
+  const tour = await Tour.findOne({
+    tour: tourId,
+    startDates: { $elemMatch: { _id: dateId, soldOut: false } },
+  });
 
-  if (date.soldOut) {
-    return next(new AppError('The tour has already been sold out', 404));
+  console.log(tour);
+
+  if (!tour) {
+    throw new AppError('The date you chose is not available.', 400);
   }
 
   // 2) Create checkout session
@@ -117,23 +121,33 @@ const fulfillOrder = async (session, user) => {
   const [tourId, dateId] = session.client_reference_id.split('/');
   const filter = {
     tour: tourId,
-    'startdates._id': dateId,
-    'startDates.soldOut': { $ne: true },
+    startDates: { $elemMatch: { _id: dateId, soldOut: false } },
   };
-  // const update = { $inc: { 'startDates.$.participants': 1 } }
-  const tour = await Tour.findOneAndUpdate(filter);
+  const update = [
+    { $inc: { 'startDates.$.participants': 1 } }, // increment # participants
+    {
+      // then set soldOut
+      $set: {
+        'startDates.$.soldOut': {
+          $cond: {
+            if: { $eq: ['$startDates.$.participants', '$maxGroupsize'] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+  ];
+  const tour = await Tour.findOneAndUpdate(filter, update, { new: true });
 
-  // If sold out, throw an error
-  if (date.soldOut) {
-    throw new AppError(
-      'The tour that starts on the date has already been sold out. Please try another date.',
-      400
-    );
+  if (!tour) {
+    // If sold out, throw an error
+    throw new AppError('The date you chose is not available.', 400);
   }
 
-  // If not, increment the number of participants and save the tour info
-  date.soldOut = ++date.participants === tour.maxGroupSize;
-  await tour.save();
+  // // If not, increment the number of participants and save the tour info
+  // date.soldOut = ++date.participants === tour.maxGroupSize;
+  // await tour.save();
 
   const price = session.amount_total / 100;
   await Booking.create({ tour: tourId, date: dateId, user: user.id, price });
