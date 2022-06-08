@@ -115,17 +115,21 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 
 const fulfillOrder = async (session, user) => {
   const [tourId, dateId] = session.client_reference_id.split('/');
-  const filter = {
-    tour: tourId,
-    startDates: {
-      $elemMatch: { _id: dateId, participants: { $ne: '$maxGroupSize' } },
-    },
-  };
-  const update = [{ $inc: { 'startDates.$.participants': 1 } }];
-  const tour = await Tour.findOneAndUpdate(filter, update, { new: true });
-  console.log(tour);
+  const tour = await Tour.findById(tourId);
+  const maxSize = tour.maxSize;
 
-  if (!tour) {
+  const updated = await Tour.findOneAndUpdate(
+    {
+      startDates: {
+        $elemMatch: { _id: dateId, participants: { $ne: maxSize } },
+      },
+    },
+    [{ $inc: { 'startDates.$.participants': 1 } }],
+    { new: true }
+  );
+  console.log(updated);
+
+  if (!updated) {
     // sold out, throw an error
     throw new AppError('The date you chose is not available.', 400);
   }
