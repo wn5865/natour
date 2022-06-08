@@ -120,6 +120,7 @@ const fulfillOrder = async (session, user) => {
 
   const updated = await Tour.findOneAndUpdate(
     {
+      tour: tourId,
       startDates: {
         $elemMatch: { _id: dateId, participants: { $ne: maxSize } },
       },
