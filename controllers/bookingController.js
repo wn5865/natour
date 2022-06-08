@@ -29,14 +29,10 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get tour
   const { tourId, dateId } = req.params;
-  const tour = await Tour.findOne({
-    tour: tourId,
-    startDates: { $elemMatch: { _id: dateId, soldOut: false } },
-  });
+  const tour = await Tour.findById(tourId);
+  const date = tour.startDates.find((el) => el.id === dateId);
 
-  console.log(tour);
-
-  if (!tour) {
+  if (date.soldOut) {
     throw new AppError('The date you chose is not available.', 400);
   }
 
@@ -121,24 +117,13 @@ const fulfillOrder = async (session, user) => {
   const [tourId, dateId] = session.client_reference_id.split('/');
   const filter = {
     tour: tourId,
-    startDates: { $elemMatch: { _id: dateId, soldOut: false } },
-  };
-  const update = [
-    { $inc: { 'startDates.$.participants': 1 } }, // increment # participants
-    {
-      // then set soldOut
-      $set: {
-        'startDates.$.soldOut': {
-          $cond: {
-            if: { $eq: ['$startDates.$.participants', '$maxGroupsize'] },
-            then: true,
-            else: false,
-          },
-        },
-      },
+    startDates: {
+      $elemMatch: { _id: dateId, soldOut: { $ne: '$maxGroupSize' } },
     },
-  ];
+  };
+  const update = [{ $inc: { 'startDates.$.participants': 1 } }];
   const tour = await Tour.findOneAndUpdate(filter, update, { new: true });
+  console.log(tour);
 
   if (!tour) {
     // If sold out, throw an error

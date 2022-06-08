@@ -98,7 +98,7 @@ exports.getAll = (Model) =>
  * routes, e.g. tours/:tourId/bookings or users/:userId/bookings
  */
 exports.setTourAndUser = (req, res, next) => {
-  req.body.tour ||= req.params.tourId;
-  req.body.user ||= req.params.userId || req.user.id;
+  if (req.params.tourId) req.body.tour = req.params.tourId;
+  if (req.params.userId) req.body.user = req.params.userId;
   next();
 };
