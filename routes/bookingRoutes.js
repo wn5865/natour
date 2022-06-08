@@ -18,7 +18,7 @@ router
   .route('/')
   .all(factory.setTourAndUser)
   .get(bookingController.getAllBookings)
-  .post(bookingController.createBooking);
+  .post(factory.setCurrentUser, bookingController.createBooking);
 
 router
   .route('/:id')

@@ -102,3 +102,12 @@ exports.setTourAndUser = (req, res, next) => {
   if (req.params.userId) req.body.user = req.params.userId;
   next();
 };
+
+/**
+ * Middleware to set req.body.user to current user in case that
+ * no user info was given as URL params
+ */
+exports.setCurrentUser = (req, res, next) => {
+  req.body.user ||= req.user;
+  next();
+};

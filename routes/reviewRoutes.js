@@ -14,6 +14,7 @@ router
   .get(reviewController.getAllReviews)
   .post(
     authController.restrictTo('user'),
+    factory.setCurrentUser,
     bookingController.checkIfBooked,
     reviewController.createReview
   );

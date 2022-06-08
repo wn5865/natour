@@ -11,7 +11,7 @@ router
   .route('/')
   .all(factory.setTourAndUser)
   .get(bookmarkController.getAllBookmarks)
-  .post(bookmarkController.createBookmark);
+  .post(factory.setCurrentUser, bookmarkController.createBookmark);
 
 router
   .route('/:id')
