@@ -47984,7 +47984,11 @@ const updateSettings = async (data, type)=>{
     try {
         const url = type === 'password' ? '/api/v1/users/updateMyPassword' : '/api/v1/users/updateMe';
         const res = await _axiosDefault.default.patch(url, data);
-        if (res.data.status === 'success') _alertsJs.showAlert('success', `${type.toUpperCase()} updated successfully`);
+        if (res.data.status === 'success') {
+            _alertsJs.showAlert('success', `${type.toUpperCase()} updated successfully`);
+            setTimeout(()=>location.reload()
+            , 1500);
+        }
     } catch (err) {
         _alertsJs.showAlert('error', err.response.data.message);
     }
@@ -48058,14 +48062,19 @@ parcelHelpers.export(exports, "handleForm", ()=>handleForm
 );
 const handleForm = function(event) {
     event.preventDefault();
-    const formData = new FormData(event.target.closest('.form'));
+    const form = event.target.closest('.form');
+    const enctype = form.getAttribute('enctype');
+    const formData = new FormData(form);
+    // If form data is encoded as multipart/form-data, return formData itself
+    if (enctype === 'multipart/form-data') return formData;
+    // If not, construct data from the entries of formData
     const data = Object.fromEntries(formData.entries());
+    // Parse data in case the data is in the format of JSON
     Object.keys(data).forEach((key)=>{
         try {
             data[key] = data[key] ? JSON.parse(data[key]) : undefined;
         } catch  {}
     });
-    console.log(data);
     return data;
 };
 

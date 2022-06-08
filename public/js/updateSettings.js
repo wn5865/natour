@@ -11,6 +11,7 @@ export const updateSettings = async (data, type) => {
     const res = await axios.patch(url, data);
     if (res.data.status === 'success') {
       showAlert('success', `${type.toUpperCase()} updated successfully`);
+      setTimeout(() => location.reload(), 1500);
     }
   } catch (err) {
     showAlert('error', err.response.data.message);

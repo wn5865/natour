@@ -115,8 +115,13 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 
 const fulfillOrder = async (session, user) => {
   const [tourId, dateId] = session.client_reference_id.split('/');
-  const tour = await Tour.findById(tourId);
-  const date = tour.startDates.find((date) => date.id === dateId);
+  const filter = {
+    tour: tourId,
+    'startdates._id': dateId,
+    'startDates.soldOut': { $ne: true },
+  };
+  // const update = { $inc: { 'startDates.$.participants': 1 } }
+  const tour = await Tour.findOneAndUpdate(filter);
 
   // If sold out, throw an error
   if (date.soldOut) {
