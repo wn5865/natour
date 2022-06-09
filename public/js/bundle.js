@@ -48190,7 +48190,7 @@ const createUser = async (data)=>{
         const res = await _axiosDefault.default.post(`/api/v1/users`, data);
         if (res.data.status === 'success') {
             _alerts.showAlert('success', 'User created');
-            setTimeout(()=>history.back()
+            setTimeout(()=>location.href = '/manage-users'
             , 3000);
         }
     } catch (err) {
@@ -48203,7 +48203,7 @@ const updateUser = async (data)=>{
         const res = await _axiosDefault.default.patch(`/api/v1/users/${id}`, data);
         if (res.data.status === 'success') {
             _alerts.showAlert('success', 'User updated');
-            setTimeout(()=>history.back()
+            setTimeout(()=>location.href = '/manage-users'
             , 3000);
         }
     } catch (err) {
@@ -48218,7 +48218,7 @@ const deleteUser = async (data)=>{
         });
         if (res.status === 200) {
             _alerts.showAlert('success', 'User deactivated');
-            setTimeout(()=>history.back()
+            setTimeout(()=>location.href = '/manage-users'
             , 3000);
         }
     } catch (err) {
