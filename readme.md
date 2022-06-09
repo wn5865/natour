@@ -32,14 +32,14 @@
   2019](https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/)
 
 - The project in this repo was built upon the final product of the course. I
-  supplemented by adding features that was proposed by the challenges given at the
+  supplemented it by adding features that was proposed by the challenges given at the
   end of Jonas' course.
 
 ## Overview
 
-- Natours is a full stack web application where users can purchase, review, and
-  bookmark tour packages. Administators can manage tours and users through admin
-  pages restricted to them.
+Natours is a full stack web application where users can purchase, review, and
+bookmark tour packages. Administators can manage tours and users through admin
+pages restricted to them.
 
 ## Deployed Version
 
@@ -112,7 +112,6 @@ https://user-images.githubusercontent.com/77910547/172808312-9b7be174-5ee5-49a5-
 #### Admin process :
 
 https://user-images.githubusercontent.com/77910547/172808336-7eed23e5-5e22-4de6-a06f-78b44b890c69.mov
-
 
 ## How To Use
 
