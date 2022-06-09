@@ -1,4 +1,4 @@
-<h1 align="center", style="display: flex; align-items: center;">
+<h1 align="center">
   <br>
   <a href="https://natours-jiwon.herokuapp.com/">
     <img src="https://github.com/wn5865/natour/blob/main/public/img/logo-green-round.png" alt="Natours" width="50">
