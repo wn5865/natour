@@ -25,24 +25,71 @@
 
 ## Acknowledgement
 
-- This project is part of the online course I've taken at Udemy. Thanks to Jonas
-  Schmedtmann for creating this awesome course! Link to the course: [Node.js,
-  Express, MongoDB & More: The Complete Bootcamp
+- This project is part of the online course by Jonas Schmedtmann on Udemy, which
+  is definitely one of the best lectures I've ever taken. Many thanks to his
+  well-organized and passionate lectures. Link to the course: [Node.js, Express,
+  MongoDB & More: The Complete Bootcamp
   2019](https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/)
+
+- The project in this repo was built upon the final product of the course. I
+  supplemented by adding features that was proposed by the challenges given at the
+  end of Jonas' course.
+
+## Overview
+
+- Natours is a full stack web application where users can purchase, review, and
+  bookmark tour packages. Administators can manage tours and users through admin
+  pages restricted to them.
 
 ## Deployed Version
 
-Live demo (Feel free to visit) 👉 : https://natours-jiwon.herokuapp.com/
+Link to Natours deployed on Heroku 👉 https://natours-jiwon.herokuapp.com/
+
+## Built With
+
+- Natours was built by using Node.js, Express, MongoDB on the back-end and
+  JavaScript, Pug on the front-end. All the tools used to build this website
+  are as below:
+
+- Backend
+
+  - [Node.js](https://nodejs.org/en/) - JS runtime environment
+  - [Express](http://expressjs.com/) - The web framework used
+
+- DB
+
+  - [Mongoose](https://mongoosejs.com/) - Object Data Modelling (ODM) library
+  - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Cloud database service
+
+- Frontend
+
+  - [Pug](https://pugjs.org/api/getting-started.html) - High performance template engine
+
+- Security
+
+  - [JSON Web Token](https://jwt.io/) - Security token
+
+- Others
+  - [Axios](https://axios-http.com/) - Promise based HTTP client for the browser and Node.js
+  - [ParcelJS](https://parceljs.org/) - Blazing fast, zero configuration web application bundler
+  - [Postman](https://www.getpostman.com/) - API platform
+  - [Stripe](https://stripe.com/) - Online payment API
+  - [Mapbox GL JS](https://www.mapbox.com/mapbox-gljs) - JavaScript library for vector maps on the web
+  - [Mailtrap](https://mailtrap.io/) - Email delivery platform
+  - [Heroku](https://www.heroku.com/) - Cloud platform
 
 ## Key Features
 
-- Sign-up, Authentication and Authorization
-  - Login and logout
+- Authentication and Authorization
+  - Sign up, login and logout
+  - Role-based athorization to APIs and pages
 - Tour
-  - Manage booking, check tours map, check users' reviews and rating
+  - Provide detailed information about tours
+  - Purchase and review tours
+  - Manage your bookings and bookmarks
 - User profile
   - Update username, photo, email, and password
-- Credit card Payment (Test mode)
+- Credit card payment powered by Stripe
 
 ## Demonstration
 
@@ -72,16 +119,21 @@ Live demo (Feel free to visit) 👉 : https://natours-jiwon.herokuapp.com/
 
 ## How To Use
 
+### Sign up and log in
+
+- First sign up and login to Natours
+- You're gonna get a welcome email from Natours if your email address is valid
+- You can go to user profile page through the link in the email
+
 ### Book a tour
 
-- Sign up and login to the site
-- Search for tours that you want to book
-- Select a tour date
+- Decide what tour you want to purchase
+- Select a date when the tours starts
 - Book a tour
-- Proceed to the payment checkout page
-- Enter the card details (Test Mode):
+- Proceed to the checkout page
+- Enter the payment details (no actual transaction occurs):
   ```
-  - Card No. : 4242 4242 4242 4242
+  - Card No. : 4242 4242 4242 4242 (valid card number for test mode)
   - Expiry date: any future dates
   - CVV: any 3-digit numbers
   ```
@@ -89,18 +141,18 @@ Live demo (Feel free to visit) 👉 : https://natours-jiwon.herokuapp.com/
 
 ### Manage your booking
 
-- Check the tour you have booked in "My Bookings" page in your user settings. You'll be automatically redirected to this page after you have completed the booking.
+- Check the tour you have booked in "My Bookings" page.
+- You'll be automatically redirected to this page after you have completed the booking.
 
 ### Leave a review
 
-- Once you've booked a tour, you can write a review on the tour in "My Bookings" page
+- Once you've booked a tour, write a review on the tour in "My Bookings" page
 - You can edit or delete your reviews
-- Reviews are shown on tour details page
+- Your reviews will be shown in the middle of tour details pages
 
 ### Bookmark tours
 
-- After logging in, go to tour details page
-- Click bookmark button on the top
+- In tour details pages, click bookmark button on the top
 - Go to your account profile
 - Check your bookmarks in 'My Bookmarks' page
 
@@ -111,35 +163,21 @@ Live demo (Feel free to visit) 👉 : https://natours-jiwon.herokuapp.com/
 ## API Usage
 
 - Natours API is authorized based on user roles: 'user', 'guide', 'lead-guide', 'admin'
-- Most GET requests are available without authentication
+- Most GET requests for tours are available without authentication
 - Mostly, POST and DELTE request are restricted to admin user
 - Some featured APIs are as follows:
 
 <b> API Features: </b>
 
-Tours List 👉 https://lakshman-natours.herokuapp.com/api/v1/tours
+Tours List 👉 https://natours-jiwon.herokuapp.com/api/v1/tours
 
-Tours State 👉 https://lakshman-natours.herokuapp.com/api/v1/tours/tour-stats
+Tour Stats By Difficulty 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/tour-stats
 
-Get Top 5 Cheap Tours 👉 https://lakshman-natours.herokuapp.com/api/v1/tours/top-5-cheap
+Get Top 5 (Cheapest and Highest-reated) Tours 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/top-5-cheap
 
-Get Tours Within Radius 👉 https://lakshman-natours.herokuapp.com/api/v1/tours/tours-within/200/center/34.098453,-118.096327/unit/mi
+Get Tours Within Radius (Tours within 200 miles from (lat 34, lng -118)) 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/tours-within/200/center/34,-118/unit/mi
 
 For more information, check [Natours API Documentation](https://documenter.getpostman.com/view/8689170/SVmzvwpY?version=latest).
-
-## Built With
-
-- [NodeJS](https://nodejs.org/en/) - JS runtime environment
-- [Express](http://expressjs.com/) - The web framework used
-- [Mongoose](https://mongoosejs.com/) - Object Data Modelling (ODM) library
-- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Cloud database service
-- [Pug](https://pugjs.org/api/getting-started.html) - High performance template engine
-- [JSON Web Token](https://jwt.io/) - Security token
-- [ParcelJS](https://parceljs.org/) - Blazing fast, zero configuration web application bundler
-- [Stripe](https://stripe.com/) - Online payment API
-- [Postman](https://www.getpostman.com/) - API testing
-- [Mailtrap](https://mailtrap.io/) - Email delivery platform
-- [Heroku](https://www.heroku.com/) - Cloud platform
 
 ## To-do
 

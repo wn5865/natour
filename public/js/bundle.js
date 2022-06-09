@@ -48136,7 +48136,7 @@ const createTour = async (data)=>{
         const res = await _axiosDefault.default.post(`/api/v1/tours`, data);
         if (res.data.status === 'success') {
             _alerts.showAlert('success', 'Tour created');
-            setTimeout(()=>history.back()
+            setTimeout(()=>location.href = '/manage-tours'
             , 3000);
         }
     } catch (err) {
@@ -48150,7 +48150,7 @@ const updateTour = async (data)=>{
         const res = await _axiosDefault.default.patch(`/api/v1/tours/${id}`, data);
         if (res.data.status === 'success') {
             _alerts.showAlert('success', 'Tour updated');
-            setTimeout(()=>history.back()
+            setTimeout(()=>location.href = '/manage-tours'
             , 3000);
         }
     } catch (err) {
@@ -48165,7 +48165,7 @@ const deleteTour = async (data)=>{
         const res = await _axiosDefault.default.delete(`/api/v1/tours/${id}`);
         if (res.status === 204) {
             _alerts.showAlert('success', 'Tour deleted');
-            setTimeout(()=>history.back()
+            setTimeout(()=>location.href = '/manage-tours'
             , 3000);
         }
     } catch (err) {
