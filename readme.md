@@ -171,9 +171,9 @@ Tour Stats By Difficulty 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/t
 
 Get Top 5 (Cheapest and Highest-reated) Tours 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/top-5-cheap
 
-Get Tours Within Radius (Tours within 200 miles from (lat 34, lng -118)) 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/tours-within/200/center/34,-118/unit/mi
+Get Tours Within Radius (Tours within 200 miles from coordinate (lat 34, lng -118)) 👉 https://natours-jiwon.herokuapp.com/api/v1/tours/tours-within/200/center/34,-118/unit/mi
 
-For more information, check [Natours API Documentation](https://documenter.getpostman.com/view/8689170/SVmzvwpY?version=latest).
+For more information, check [Natours API Documentation](https://documenter.getpostman.com/view/19710567/UyxbqVHb).
 
 ## To-do
 
