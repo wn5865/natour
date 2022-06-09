@@ -95,7 +95,7 @@ Link to Natours deployed on Heroku 👉 https://natours-jiwon.herokuapp.com/
 
 #### Home Page :
 
-https://user-images.githubusercontent.com/77910547/172806944-eebe92e0-9472-4285-ab62-f396fe75081d.mov
+![natoursHomePageonline-video-cutt](https://user-images.githubusercontent.com/77910547/172806944-eebe92e0-9472-4285-ab62-f396fe75081d.mov)
 
 
 #### Tour Detafils :
