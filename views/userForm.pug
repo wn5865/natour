@@ -14,7 +14,7 @@ block content
             if curUser
               img.form__user-photo(src=`/img/users/${photo}`, alt=`User photo`)
             h2.heading-secondary.ma-bt-md= `${curUser ? curUser.name : 'Create user'}`
-          form.form.form-user-data(enctype='multipart/form-data')
+          form.form.form-user-data
             if curUser
               .form__group
                 label.form__label ID

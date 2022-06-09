@@ -16,7 +16,6 @@ export const createUser = async (data) => {
 export const updateUser = async (data) => {
   try {
     const id = data._id;
-    delete data._id;
 
     const res = await axios.patch(`/api/v1/users/${id}`, data);
     if (res.data.status === 'success') {

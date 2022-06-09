@@ -21,5 +21,6 @@ export const handleForm = function (event) {
       data[key] = data[key] ? JSON.parse(data[key]) : undefined;
     } catch {}
   });
+
   return data;
 };

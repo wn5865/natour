@@ -48200,7 +48200,6 @@ const createUser = async (data)=>{
 const updateUser = async (data)=>{
     try {
         const id = data._id;
-        delete data._id;
         const res = await _axiosDefault.default.patch(`/api/v1/users/${id}`, data);
         if (res.data.status === 'success') {
             _alerts.showAlert('success', 'User updated');
