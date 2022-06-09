@@ -158,6 +158,7 @@ https://user-images.githubusercontent.com/77910547/172808336-7eed23e5-5e22-4de6-
 
 ## API Usage
 
+- Natours API provides to CRUD tours or users
 - Authentication by JSON Web Token. You can get the token once you sign up or log in
 - Authorization based on user roles: 'user', 'guide', 'lead-guide', 'admin'
 - Some featured APIs are as follows:
