@@ -80,23 +80,23 @@ Link to Natours deployed on Heroku 👉 https://natours-jiwon.herokuapp.com/
 
 #### Home Page :
 
-https://user-images.githubusercontent.com/77910547/172806944-eebe92e0-9472-4285-ab62-f396fe75081d.mov
+![homepage](https://user-images.githubusercontent.com/77910547/172957673-867b8c7f-e63e-4fa6-aa3c-e1ca4ac9a920.gif)
 
 #### Signup process
 
-https://user-images.githubusercontent.com/77910547/172808240-e182dff6-9765-49aa-aebd-9b7f2dfa4b74.mov
+![sign-up-process](https://user-images.githubusercontent.com/77910547/172957677-6d9e969f-66fd-471c-8f34-ae9b35a37cfc.gif)
 
 #### Tour Details :
 
-https://user-images.githubusercontent.com/77910547/172807655-7f50421a-77ad-4ce9-add6-ec86e47afbb7.mov
+![tour-details](https://user-images.githubusercontent.com/77910547/172957682-412289ec-8b68-4648-8354-b81d2df4c3e0.gif)
 
 #### Booking and Review Process :
 
-https://user-images.githubusercontent.com/77910547/172808312-9b7be174-5ee5-49a5-b260-9fb508a6a8d6.mov
+![booking-review](https://user-images.githubusercontent.com/77910547/172957664-7b14723c-a50e-4541-98eb-f4ae1d58dc68.gif)
 
 #### Admin process :
 
-https://user-images.githubusercontent.com/77910547/172808336-7eed23e5-5e22-4de6-a06f-78b44b890c69.mov
+![admin](https://user-images.githubusercontent.com/77910547/172957754-6b09806a-66e4-4625-a011-1a0b9d24962f.gif)
 
 ## How To Use
 
