@@ -22,7 +22,7 @@
 
 ## Overview
 
-Natours is a full stack web application where users can purchase, review, and
+Natours is a server-side rendered web application where users can purchase, review, and
 bookmark tour packages. Administators can manage tours and users through admin
 pages restricted to them.
 
