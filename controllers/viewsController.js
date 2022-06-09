@@ -188,6 +188,7 @@ exports.getUserForm = catchAsync(async (req, res, next) => {
   const id = req.params.userId;
   const user = id ? await User.findById(id).select('+active') : undefined;
   res.status(200).render('userForm', {
+    title: 'User info',
     curUser: user,
   });
 });
