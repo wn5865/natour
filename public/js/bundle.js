@@ -18805,7 +18805,11 @@ const displayMap = (locations)=>{
         style: 'mapbox://styles/wn2952/cl2u9ytmg000f14s1nc3sil6m',
         scrollZoom: false
     });
+    // Add zoom and rotation controls to the map.
+    map.addControl(new _mapboxGlDefault.default.NavigationControl());
+    // Set bounds
     const bounds = new _mapboxGlDefault.default.LngLatBounds();
+    // Add markers and pop-ups
     locations.forEach((loc)=>{
         // Create marker
         const el = document.createElement('div');

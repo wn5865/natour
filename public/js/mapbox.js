@@ -13,7 +13,13 @@ export const displayMap = (locations) => {
     // interactive: false,
   });
 
+  // Add zoom and rotation controls to the map.
+  map.addControl(new mapboxgl.NavigationControl());
+
+  // Set bounds
   const bounds = new mapboxgl.LngLatBounds();
+
+  // Add markers and pop-ups
   locations.forEach((loc) => {
     // Create marker
     const el = document.createElement('div');
