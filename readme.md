@@ -158,9 +158,8 @@ https://user-images.githubusercontent.com/77910547/172808336-7eed23e5-5e22-4de6-
 
 ## API Usage
 
-- Natours API is authorized based on user roles: 'user', 'guide', 'lead-guide', 'admin'
-- Most GET requests for tours are available without authentication
-- Mostly, POST and DELTE request are restricted to admin user
+- Authentication by JSON Web Token. You can get the token once you sign up or log in
+- Authorization based on user roles: 'user', 'guide', 'lead-guide', 'admin'
 - Some featured APIs are as follows:
 
 <b> API Features: </b>
@@ -181,9 +180,11 @@ For more information, check [Natours API Documentation](https://documenter.getpo
   - Allow users to search tours based on tour name, price, tour date, etc.
   - Allow admins to search users using name and email.
 - Pagination
-  - Although pagination already exists as an API feature, it's not being utilized on the frontend
+  - Although pagination already exists as an API feature, it's not being
+    utilized on the frontend
 - Admin pages
-  - Currently, administrators can CRUD (create, read, update, delete) tours and users in "Manage Tours" and "Manage Users" pages
-  - For administrators, implement “Manage” pages, where they can CRUD reviews and bookings
+  - For administrators, implement admin pages for reviews and bookings
+  - Currently, administrators can CRUD (create, read, update, delete) tours and
+    users in "Manage Tours" and "Manage Users" pages
 - Advanced authentication features
   - Confirm user email, login with refresh token, two-factor authentication
